@@ -2,7 +2,7 @@ var _ = require('lodash'),
     colors = require('colors');
 
 var treasure = require('./Treasure'),
-    game = require('./Game');
+    players = require('./Players');
 
 function log(text) {
     process.stdout.write(text);
@@ -26,7 +26,11 @@ function pipe() {
 }
 
 function coord(n) {
-    log(('' + n).white);
+    if (n % 2 == 1) {
+        log(('' + n).yellow);
+    } else {
+        log(('' + n).white);
+    }
 }
 
 function wall() {
@@ -121,11 +125,7 @@ function printGrid(grid, includeBorder, showWizards) {
     }
 
     var maxX = grid.length - 1,
-        maxY = grid.length - 1,
-        player1 = game.players[1],
-        player2 = game.players[2],
-        player3 = game.players[3],
-        player4 = game.players[4];
+        maxY = grid.length - 1;
 
     hr();
 
@@ -147,9 +147,9 @@ function printGrid(grid, includeBorder, showWizards) {
                 var exits = grid[x][y].exits;
                 switch (pass) {
                     case 0:
-                        showWizards && player3.x == x && player3.y == y ? wizard(player3) : wall();
+                        showWizards && _.includes(grid[x][y].players, players._3) ? wizard(players._3) : wall();
                         _.includes(exits, 0) ? space() : wall();
-                        showWizards && player4.x == x && player4.y == y ? wizard(player4) : wall();
+                        showWizards && _.includes(grid[x][y].players, players._4) ? wizard(players._4) : wall();
                         break;
                     case 1:
                         _.includes(exits, 3) ? space() : wall();
@@ -157,9 +157,9 @@ function printGrid(grid, includeBorder, showWizards) {
                         _.includes(exits, 1) ? space() : wall();
                         break;
                     case 2:
-                        showWizards && player1.x == x && player1.y == y ? wizard(player1) : wall();
+                        showWizards && _.includes(grid[x][y].players, players._1) ? wizard(players._1) : wall();
                         _.includes(exits, 2) ? space() : wall();
-                        showWizards && player2.x == x && player2.y == y ? wizard(player2) : wall();
+                        showWizards && _.includes(grid[x][y].players, players._2) ? wizard(players._2) : wall();
                         break;
                 }
                 pipe();

@@ -12,9 +12,9 @@ var board = require('./Board'),
 printer.printGrid(grid);
 printer.printTile(tile);
 
-//boardOps.play(board, 1, 0);
+boardOps.play(board, 1, 0);
 //
-//printer.printGrid(grid);
-//printer.printTile(tile);
+printer.printGrid(grid);
+printer.printTile(tile);
 
 // ---------------------------------
