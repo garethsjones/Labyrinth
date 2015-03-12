@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-var treasure = require('./Treasure');
+var treasure = require('./Treasures');
 
 var deck = [];
 
