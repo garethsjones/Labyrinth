@@ -22,7 +22,7 @@ function Tile(exits, treasure, players) {
     });
 
     this.removePlayer = function(id) {
-        self.players[id] = null;
+        delete self.players[id];
     };
 
     this.spin = function() {

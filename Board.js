@@ -63,50 +63,53 @@ function Board(bag, players) {
             tiles = [],
             unexplored = [];
 
-        var startCoord = {x: x, y: y};
-        coords.push(startCoord);
-        unexplored.push(startCoord);
+        var coord = {x: x, y: y};
+        coords.push(coord);
+        unexplored.push(coord);
 
         while (unexplored.length != 0) {
 
-            var unexploredCoord = unexplored.pop();
-            var tile = grid[unexploredCoord.x][unexploredCoord.y];
+            coord = unexplored.pop();
+            var tile = grid[coord.x][coord.y];
+            if (!_.contains(tiles, tile)) {
+                continue;
+            }
 
             //up
-            if (y < self.length - 1 && _.contains(tile.exits, 0) && _.contains(grid[unexploredCoord.x][unexploredCoord.y + 1].exits, 2)) {
-                var neighbour = grid[unexploredCoord.x][unexploredCoord.y + 1];
+            if (y < self.length - 1 && _.contains(tile.exits, 0) && _.contains(grid[coord.x][coord.y + 1].exits, 2)) {
+                var neighbour = grid[coord.x][coord.y + 1];
                 if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: unexploredCoord.x, y: unexploredCoord.y + 1};
+                    var newCoord = {x: coord.x, y: coord.y + 1};
                     coords.push(newCoord);
                     unexplored.push(newCoord);
                 }
             }
 
             //down
-            if (y > 0 && _.contains(tile.exits, 2) && _.contains(grid[unexploredCoord.x][unexploredCoord.y - 1].exits, 0)) {
-                var neighbour = grid[unexploredCoord.x][unexploredCoord.y - 1];
+            if (y > 0 && _.contains(tile.exits, 2) && _.contains(grid[coord.x][coord.y - 1].exits, 0)) {
+                var neighbour = grid[coord.x][coord.y - 1];
                 if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: unexploredCoord.x, y: unexploredCoord.y - 1};
+                    var newCoord = {x: coord.x, y: coord.y - 1};
                     coords.push(newCoord);
                     unexplored.push(newCoord);
                 }
             }
 
             //left
-            if (x > 0 && _.contains(tile.exits, 3) && _.contains(grid[unexploredCoord.x - 1][unexploredCoord.y].exits, 1)) {
-                var neighbour = grid[unexploredCoord.x - 1][unexploredCoord.y];
+            if (x > 0 && _.contains(tile.exits, 3) && _.contains(grid[coord.x - 1][coord.y].exits, 1)) {
+                var neighbour = grid[coord.x - 1][coord.y];
                 if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: unexploredCoord.x - 1, y: unexploredCoord.y};
+                    var newCoord = {x: coord.x - 1, y: coord.y};
                     coords.push(newCoord);
                     unexplored.push(newCoord);
                 }
             }
 
             //right
-            if (x < self.length - 1 && _.contains(tile.exits, 1) && _.contains(grid[unexploredCoord.x + 1][unexploredCoord.y].exits, 3)) {
-                var neighbour = grid[unexploredCoord.x + 1][unexploredCoord.y];
+            if (x < self.length - 1 && _.contains(tile.exits, 1) && _.contains(grid[coord.x + 1][coord.y].exits, 3)) {
+                var neighbour = grid[coord.x + 1][coord.y];
                 if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: unexploredCoord.x + 1, y: unexploredCoord.y};
+                    var newCoord = {x: coord.x + 1, y: coord.y};
                     coords.push(newCoord);
                     unexplored.push(newCoord);
                 }
