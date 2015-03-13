@@ -1,8 +1,7 @@
 var _ = require('lodash'),
     colors = require('colors');
 
-var treasure = require('./Treasure'),
-    players = require('./Players');
+var treasure = require('./Treasures');
 
 function log(text) {
     process.stdout.write(text);
@@ -103,7 +102,7 @@ function wizard(player) {
 var WALL = '#',
     SPACE = 'O';
 
-function printGrid(grid, includeBorder, showWizards) {
+function printGrid(board, includeBorder, showWizards) {
     includeBorder = typeof includeBorder !== 'undefined' ? includeBorder : true;
     showWizards = typeof showWizards !== 'undefined' ? showWizards : true;
 
@@ -111,7 +110,7 @@ function printGrid(grid, includeBorder, showWizards) {
         bottomRow = typeof bottomRow !== 'undefined' ? bottomRow : false;
 
         log((includeBorder ? '-+' : '+').grey);
-        _.times((grid.length), function(n) {
+        _.times((board.length), function(n) {
             hyphen();
             if (bottomRow && includeBorder) {
                 coord(n);
@@ -124,8 +123,8 @@ function printGrid(grid, includeBorder, showWizards) {
         return console.log();
     }
 
-    var maxX = grid.length - 1,
-        maxY = grid.length - 1;
+    var maxX = board.length - 1,
+        maxY = board.length - 1;
 
     hr();
 
@@ -144,22 +143,23 @@ function printGrid(grid, includeBorder, showWizards) {
 
                 if (x == 0) pipe();
 
-                var exits = grid[x][y].exits;
+                var tile = board.get(x, y);
+
                 switch (pass) {
                     case 0:
-                        showWizards && _.includes(grid[x][y].players, players._3) ? wizard(players._3) : wall();
-                        _.includes(exits, 0) ? space() : wall();
-                        showWizards && _.includes(grid[x][y].players, players._4) ? wizard(players._4) : wall();
+                        showWizards && tile.players[3] ? wizard(tile.players[3]) : wall();
+                        _.includes(tile.exits, 0) ? space() : wall();
+                        showWizards && tile.players[4] ? wizard(tile.players[4]) : wall();
                         break;
                     case 1:
-                        _.includes(exits, 3) ? space() : wall();
-                        grid[x][y].treasure == treasure.EMPTY ? space() : treasureSpace(grid[x][y].treasure);
-                        _.includes(exits, 1) ? space() : wall();
+                        _.includes(tile.exits, 3) ? space() : wall();
+                        board.get(x, y).treasure == treasure.EMPTY ? space() : treasureSpace(tile.treasure);
+                        _.includes(tile.exits, 1) ? space() : wall();
                         break;
                     case 2:
-                        showWizards && _.includes(grid[x][y].players, players._1) ? wizard(players._1) : wall();
-                        _.includes(exits, 2) ? space() : wall();
-                        showWizards && _.includes(grid[x][y].players, players._2) ? wizard(players._2) : wall();
+                        showWizards && tile.players[1] ? wizard(tile.players[1]) : wall();
+                        _.includes(tile.exits, 2) ? space() : wall();
+                        showWizards && tile.players[2] ? wizard(tile.players[2]) : wall();
                         break;
                 }
                 pipe();
@@ -171,10 +171,46 @@ function printGrid(grid, includeBorder, showWizards) {
 }
 
 function printTile(tile) {
-    var grid = [];
-    grid[0] = [];
-    grid[0][0] = tile;
-    return printGrid(grid, false, false);
+
+    var exits = tile.exits;
+
+    function hr() {
+        wall();
+        log('+'.grey);
+        _.times(3, hyphen);
+        join();
+        return console.log();
+    }
+
+    hr();
+
+    _.times(3, function(pass) {
+        wall();
+        pipe();
+
+        switch (pass) {
+            case 0:
+                wall();
+                _.includes(exits, 0) ? space() : wall();
+                wall();
+                break;
+            case 1:
+                _.includes(exits, 3) ? space() : wall();
+                tile.treasure == treasure.EMPTY ? space() : treasureSpace(tile.treasure);
+                _.includes(exits, 1) ? space() : wall();
+                break;
+            case 2:
+                wall();
+                _.includes(exits, 2) ? space() : wall();
+                wall();
+                break;
+        }
+
+        pipe();
+        console.log();
+    });
+
+    hr();
 }
 
 module.exports = {
