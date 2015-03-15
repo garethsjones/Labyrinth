@@ -43,6 +43,18 @@ function Board(bag, players) {
         return grid[x][y];
     };
 
+    this.whereIsTreasure = function(symbol) {
+        var result = {x: '?', y: '?'};
+        _.each(_.range(self.length), function(x) {
+            _.each(_.range(self.length), function(y) {
+                if (grid[x][y].treasure.symbol == symbol) {
+                    result = {x: x, y: y};
+                }
+            });
+        });
+        return result;
+    };
+
     this.whereIsPlayer = function(id) {
         var result = {x: '?', y: '?'};
         _.each(_.range(self.length), function(x) {
@@ -59,66 +71,75 @@ function Board(bag, players) {
 
     this.whereCanIGo = function(x, y) {
 
-        var coords = [],
-            tiles = [],
-            unexplored = [];
+        var resultCoords = [],
+            accessibleTiles = [],
+            unexploredCoords = [];
 
-        var coord = {x: x, y: y};
-        coords.push(coord);
-        unexplored.push(coord);
+        function tileSeen(tile) {
+            return _.some(accessibleTiles, function(accessibleTile) {
+                return _.isEqual(accessibleTile, tile);
+            });
+        }
 
-        while (unexplored.length != 0) {
+        var coords = {x: x, y: y};
+        resultCoords.push(coords);
+        unexploredCoords.push(coords);
 
-            coord = unexplored.pop();
-            var tile = grid[coord.x][coord.y];
-            if (!_.contains(tiles, tile)) {
+        while (unexploredCoords.length != 0) {
+
+            coords = unexploredCoords.pop();
+            var tile = grid[coords.x][coords.y];
+            if (tileSeen(tile)) {
                 continue;
             }
 
+            var neighbour,
+                nextCoords;
+
             //up
-            if (y < self.length - 1 && _.contains(tile.exits, 0) && _.contains(grid[coord.x][coord.y + 1].exits, 2)) {
-                var neighbour = grid[coord.x][coord.y + 1];
-                if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: coord.x, y: coord.y + 1};
-                    coords.push(newCoord);
-                    unexplored.push(newCoord);
+            if (coords.y < self.length - 1 && _.contains(tile.exits, 0) && _.contains(grid[coords.x][coords.y + 1].exits, 2)) {
+                neighbour = grid[coords.x][coords.y + 1];
+                if (!tileSeen(neighbour)) {
+                    nextCoords = {x: coords.x, y: coords.y + 1};
+                    resultCoords.push(nextCoords);
+                    unexploredCoords.push(nextCoords);
                 }
             }
 
             //down
-            if (y > 0 && _.contains(tile.exits, 2) && _.contains(grid[coord.x][coord.y - 1].exits, 0)) {
-                var neighbour = grid[coord.x][coord.y - 1];
-                if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: coord.x, y: coord.y - 1};
-                    coords.push(newCoord);
-                    unexplored.push(newCoord);
+            if (coords.y > 0 && _.contains(tile.exits, 2) && _.contains(grid[coords.x][coords.y - 1].exits, 0)) {
+                neighbour = grid[coords.x][coords.y - 1];
+                if (!tileSeen(neighbour)) {
+                    nextCoords = {x: coords.x, y: coords.y - 1};
+                    resultCoords.push(nextCoords);
+                    unexploredCoords.push(nextCoords);
                 }
             }
 
             //left
-            if (x > 0 && _.contains(tile.exits, 3) && _.contains(grid[coord.x - 1][coord.y].exits, 1)) {
-                var neighbour = grid[coord.x - 1][coord.y];
-                if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: coord.x - 1, y: coord.y};
-                    coords.push(newCoord);
-                    unexplored.push(newCoord);
+            if (coords.x > 0 && _.contains(tile.exits, 3) && _.contains(grid[coords.x - 1][coords.y].exits, 1)) {
+                neighbour = grid[coords.x - 1][coords.y];
+                if (!tileSeen(neighbour)) {
+                    nextCoords = {x: coords.x - 1, y: coords.y};
+                    resultCoords.push(nextCoords);
+                    unexploredCoords.push(nextCoords);
                 }
             }
 
             //right
-            if (x < self.length - 1 && _.contains(tile.exits, 1) && _.contains(grid[coord.x + 1][coord.y].exits, 3)) {
-                var neighbour = grid[coord.x + 1][coord.y];
-                if (!_.contains(tiles, neighbour)) {
-                    var newCoord = {x: coord.x + 1, y: coord.y};
-                    coords.push(newCoord);
-                    unexplored.push(newCoord);
+            if (coords.x < self.length - 1 && _.contains(tile.exits, 1) && _.contains(grid[coords.x + 1][coords.y].exits, 3)) {
+                neighbour = grid[coords.x + 1][coords.y];
+                if (!tileSeen(neighbour)) {
+                    nextCoords = {x: coords.x + 1, y: coords.y};
+                    resultCoords.push(nextCoords);
+                    unexploredCoords.push(nextCoords);
                 }
             }
 
-            tiles.push(tile);
+            accessibleTiles.push(tile);
         }
 
-        return coords;
+        return resultCoords;
     };
 
     this.play = function (x, y, tile) {

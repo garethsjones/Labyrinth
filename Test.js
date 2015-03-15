@@ -21,28 +21,26 @@ players[4] = player4;
 
 var bag = new Bag(),
     board = new Board(bag, players),
-    turn = 0,
-    phase = 'play';
+    turn = 0;
 
 var player = players[_.keys(players)[turn]];
 
 function print() {
+    Printer.printGrid(board, [], player.colour);
+    var coords = board.whereIsPlayer(player.id);
+    var availableCoords = board.whereCanIGo(coords.x, coords.y);
     console.log('Board:');
-    Printer.printGrid(board);
+    Printer.printGrid(board, availableCoords, player.colour);
     console.log();
     console.log('Next piece:');
     Printer.printTile(bag.peekTile());
     console.log();
     console.log('What\'s up ' + player.colour + '?');
-
-    var coords = board.whereIsPlayer(player.id);
     console.log('You\'re at ' + coords.x + ',' + coords.y);
-
-    var availableCoords = board.whereCanIGo(coords.x, coords.y);
     console.log("You can go:");
     var s = "";
-    _.forEach(availableCoords, function(coord) {
-        s += coord.x + ',' + coord.y + ' ';
+    _.forEach(availableCoords, function(coords) {
+        s += coords.x + ',' + coords.y + ' ';
     });
     console.log(s);
 }
@@ -69,43 +67,35 @@ stdin.addListener("data", function(input) {
             bag.peekTile().turn(2);
             break;
         case /play (\d+),(\d+)/.test(input):
-            if (phase == 'play') {
-                var match = /play (\d+),(\d+)/.exec(input);
-                var tile = board.play(match[1], match[2], bag.getTile())
-                bag.putTile(tile);
-                phase = 'move'
-            } else {
-                console.log("You can't play a tile at the moment");
-            }
+            var match = /play (\d+),(\d+)/.exec(input);
+            var tile = board.play(match[1], match[2], bag.getTile())
+            bag.putTile(tile);
             break;
         case /move (\d+),(\d+)/.test(input):
-            if (phase == 'move') {
-                var match = /move (\d+),(\d+)/.exec(input);
+            var match = /move (\d+),(\d+)/.exec(input);
 
-                var coords = board.whereIsPlayer(player.id);
-                var availableCoords = board.whereCanIGo(coords.x, coords.y);
+            var coords = board.whereIsPlayer(player.id);
+            var availableCoords = board.whereCanIGo(coords.x, coords.y);
 
-                var legal = false;
-                _.forEach(availableCoords, function (coord) {
-                    if (coord.x == match[1] && coord.y == match[2]) {
-                        legal = true;
-                    }
-                });
-
-                if (!legal) {
-                    console.log("You can't move to " + match[1] + "," + match[2]);
-                    break;
+            var legal = false;
+            _.forEach(availableCoords, function (coord) {
+                if (coord.x == match[1] && coord.y == match[2]) {
+                    legal = true;
                 }
+            });
 
-                board.get(coords.x, coords.y).removePlayer(player.id);
-                board.get(match[1], match[2]).addPlayer(player);
-
-                turn = ++turn % _.keys(players).length;
-                player = players[_.keys(players)[turn]];
-                phase = 'play';
-            } else {
-                console.log("You can't move right now");
+            if (!legal) {
+                console.log("You can't move to " + match[1] + "," + match[2]);
+                break;
             }
+
+            board.get(coords.x, coords.y).removePlayer(player.id);
+            board.get(match[1], match[2]).addPlayer(player);
+
+            turn = ++turn % _.keys(players).length;
+            player = players[_.keys(players)[turn]];
+            phase = 'play';
+
             break;
         default:
             console.log("I don't know how to " + input);

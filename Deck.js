@@ -1,15 +1,18 @@
 var _ = require('lodash');
 
-var treasure = require('./Treasures');
+var Treasure = require('./Treasures');
 
-var deck = [];
+var Deck = function () {
+    var self = this;
+    this.cards = [];
 
-_.forEach(treasure, function(item) {
-    if (item.collectable) {
-        deck.push(_.omit(item, 'collectable'));
-    }
-});
+    _.forEach(Treasure, function(item) {
+        if (item.collectable) {
+            self.cards.push(_.omit(item, 'collectable'));
+        }
+    });
 
-deck = _.shuffle(deck);
+    this.cards = _.shuffle(this.cards);
+};
 
-module.exports = deck;
+module.exports = Deck;

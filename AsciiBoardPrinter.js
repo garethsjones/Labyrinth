@@ -3,6 +3,9 @@ var _ = require('lodash'),
 
 var treasure = require('./Treasures');
 
+var WALL = '#',
+    SPACE = 'O';
+
 function log(text) {
     process.stdout.write(text);
 }
@@ -36,8 +39,30 @@ function wall() {
     log(WALL.black);
 }
 
-function space() {
-    log(SPACE.white.bgWhite);
+function space(colour) {
+
+    switch (colour) {
+        case 'red':
+            log(SPACE.red.bgRed);
+            break;
+        case 'yellow':
+            log(SPACE.yellow.bgYellow);
+            break;
+        case 'blue':
+            log(SPACE.blue.bgBlue);
+            break;
+        case 'green':
+            log(SPACE.green.bgGreen);
+            break;
+        case 'cyan':
+            log(SPACE.cyan.bgCyan);
+            break;
+        case 'magenta':
+            log(SPACE.magenta.bgMagenta);
+            break;
+        default:
+            log(SPACE.white.bgWhite);
+    }
 }
 
 function treasureSpace(treasure) {
@@ -99,20 +124,15 @@ function wizard(player) {
     }
 }
 
-var WALL = '#',
-    SPACE = 'O';
-
-function printGrid(board, includeBorder, showWizards) {
-    includeBorder = typeof includeBorder !== 'undefined' ? includeBorder : true;
-    showWizards = typeof showWizards !== 'undefined' ? showWizards : true;
+function printGrid(board, highlightCoords, highlightColour) {
 
     function hr(bottomRow) {
         bottomRow = typeof bottomRow !== 'undefined' ? bottomRow : false;
 
-        log((includeBorder ? '-+' : '+').grey);
+        log('-+'.grey);
         _.times((board.length), function(n) {
             hyphen();
-            if (bottomRow && includeBorder) {
+            if (bottomRow) {
                 coord(n);
             } else {
                 hyphen();
@@ -131,12 +151,10 @@ function printGrid(board, includeBorder, showWizards) {
     for (var y = maxY; y >= 0; y--) {
         for (var pass = 0; pass < 3; pass++) {
 
-            if (includeBorder) {
-                if (pass == 1) {
-                    coord(y)
-                } else {
-                    wall();
-                }
+            if (pass == 1) {
+                coord(y)
+            } else {
+                wall();
             }
 
             for (var x = 0; x <= maxX; x++) {
@@ -144,22 +162,27 @@ function printGrid(board, includeBorder, showWizards) {
                 if (x == 0) pipe();
 
                 var tile = board.get(x, y);
+                var spaceColour = 'white';
+
+                if (_.some(highlightCoords, {x: x, y: y})) {
+                    spaceColour = highlightColour;
+                }
 
                 switch (pass) {
                     case 0:
-                        showWizards && tile.players[3] ? wizard(tile.players[3]) : wall();
-                        _.includes(tile.exits, 0) ? space() : wall();
-                        showWizards && tile.players[4] ? wizard(tile.players[4]) : wall();
+                        tile.players[3] ? wizard(tile.players[3]) : wall();
+                        _.includes(tile.exits, 0) ? space(spaceColour) : wall();
+                        tile.players[4] ? wizard(tile.players[4]) : wall();
                         break;
                     case 1:
-                        _.includes(tile.exits, 3) ? space() : wall();
-                        board.get(x, y).treasure == treasure.EMPTY ? space() : treasureSpace(tile.treasure);
-                        _.includes(tile.exits, 1) ? space() : wall();
+                        _.includes(tile.exits, 3) ? space(spaceColour) : wall();
+                        board.get(x, y).treasure == treasure.EMPTY ? space(spaceColour) : treasureSpace(tile.treasure);
+                        _.includes(tile.exits, 1) ? space(spaceColour) : wall();
                         break;
                     case 2:
-                        showWizards && tile.players[1] ? wizard(tile.players[1]) : wall();
-                        _.includes(tile.exits, 2) ? space() : wall();
-                        showWizards && tile.players[2] ? wizard(tile.players[2]) : wall();
+                        tile.players[1] ? wizard(tile.players[1]) : wall();
+                        _.includes(tile.exits, 2) ? space(spaceColour) : wall();
+                        tile.players[2] ? wizard(tile.players[2]) : wall();
                         break;
                 }
                 pipe();
