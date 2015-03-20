@@ -25,6 +25,14 @@ function Tile(exits, treasure, players) {
         delete self.players[id];
     };
 
+    this.getPlayers = function() {
+        return self.players;
+    };
+
+    this.setPlayers = function(players) {
+        self.players = players;
+    };
+
     this.spin = function() {
         var turns = _.random(3);
         return this.turn(turns);

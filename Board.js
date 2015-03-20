@@ -44,7 +44,7 @@ function Board(bag, players) {
     };
 
     this.whereIsTreasure = function(symbol) {
-        var result = {x: '?', y: '?'};
+        var result = null;
         _.each(_.range(self.length), function(x) {
             _.each(_.range(self.length), function(y) {
                 if (grid[x][y].treasure.symbol == symbol) {
@@ -56,7 +56,7 @@ function Board(bag, players) {
     };
 
     this.whereIsPlayer = function(id) {
-        var result = {x: '?', y: '?'};
+        var result = null;
         _.each(_.range(self.length), function(x) {
             _.each(_.range(self.length), function(y) {
                 _.each(grid[x][y].players, function(player) {
@@ -142,7 +142,53 @@ function Board(bag, players) {
         return resultCoords;
     };
 
+    this.isPlayable = function (x, y) {
+        var onRight = x == 0,
+            onLeft = x == this.length - 1,
+            onBottom = y == 0,
+            onTop = y == this.length -1;
+
+        if (!(onBottom || onTop ||onRight || onLeft)) {
+            console.log("Illegal move. Must be on board edge.");
+            return false;
+        }
+
+        if (onBottom) {
+            if (x % 2 == 0) {
+                console.log("Illegal move. Must be on odd column.");
+                return false;
+            }
+        }
+
+        if (onTop) {
+            if (x % 2 == 0) {
+                console.log("Illegal move. Must be on odd column.");
+                return false;
+            }
+        }
+
+        if (onRight) {
+            if (y % 2 == 0) {
+                console.log("Illegal move. Must be on odd row.");
+                return false;
+            }
+        }
+
+        if (onLeft) {
+            if (y % 2 == 0) {
+                console.log("Illegal move. Must be on odd row.");
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     this.play = function (x, y, tile) {
+
+        if (!self.isPlayable(x, y)) {
+            throw new Error("Illegal move");
+        }
 
         var onRight = x == 0,
             onLeft = x == this.length - 1,
@@ -150,17 +196,7 @@ function Board(bag, players) {
             onTop = y == this.length -1,
             spare = null;
 
-        if (!(onBottom || onTop ||onRight || onLeft)) {
-            console.log("Illegal move. Must be on board edge.");
-            return tile;
-        }
-
         if (onBottom) {
-            if (x % 2 == 0) {
-                console.log("Illegal move. Must be on odd column.");
-                return tile;
-            }
-
             spare = grid[x][this.length - 1];
 
             _.forEach(_.range(this.length - 1, 0, -1), function(y) {
@@ -171,11 +207,6 @@ function Board(bag, players) {
         }
 
         if (onTop) {
-            if (x % 2 == 0) {
-                console.log("Illegal move. Must be on odd column.");
-                return tile;
-            }
-
             spare = grid[x][0];
 
             _.forEach(_.range(0, this.length - 1, +1), function(y) {
@@ -186,11 +217,6 @@ function Board(bag, players) {
         }
 
         if (onRight) {
-            if (y % 2 == 0) {
-                console.log("Illegal move. Must be on odd row.");
-                return tile;
-            }
-
             spare = grid[this.length - 1][y];
 
             _.forEach(_.range(this.length - 1, 0, -1), function(x) {
@@ -201,11 +227,6 @@ function Board(bag, players) {
         }
 
         if (onLeft) {
-            if (y % 2 == 0) {
-                console.log("Illegal move. Must be on odd row.");
-                return tile;
-            }
-
             spare = grid[0][y];
 
             _.forEach(_.range(0, this.length - 1, +1), function(x) {
@@ -214,6 +235,9 @@ function Board(bag, players) {
 
             grid[this.length - 1][y] = tile;
         }
+
+        tile.setPlayers(spare.getPlayers());
+        spare.setPlayers({});
 
         return spare;
     };
