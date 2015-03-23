@@ -10,7 +10,7 @@ var Bag = require('./Bag'),
 
 var bag = new Bag(),
     deck = new Deck(),
-    TREASURES_TO_WIN = 1,
+    TREASURES_TO_WIN = 3,
     turn = 0,
     phase = 'play';
 
@@ -122,7 +122,7 @@ stdin.addListener("data", function(input) {
                 console.log('Treasure ' + treasureSymbol + ' is at ' + coords.x + ',' + coords.y);
             } else {
                 if (bag.peekTile().treasure.symbol == treasureSymbol) {
-                    console.log('Treasure ' + treasureSymbol + ' is on the space tile');
+                    console.log('Treasure ' + treasureSymbol + ' is on the spare tile');
                 } else {
                     console.log('Treasure ' + treasureSymbol + ' not found');
                 }
