@@ -6,48 +6,49 @@ var Tile = require('./Tile'),
 function Board(bag, players) {
 
     var self = this;
-    var grid = [];
+    this.grid = [];
     this.length = 7;
+    this.previousPlay = {x: null, y: null};
 
     _.each(_.range(self.length), function(x) {
-        grid[x] = [];
+        self.grid[x] = [];
     });
 
-    grid[0][0] = new Tile([0,1], Treasure.GREEN_EXIT, [players[1]]);
-    grid[6][0] = new Tile([0,3], Treasure.BLUE_EXIT, [players[2]]);
-    grid[0][6] = new Tile([1,2], Treasure.YELLOW_EXIT, [players[3]]);
-    grid[6][6] = new Tile([2,3], Treasure.RED_EXIT, [players[4]]);
+    this.grid[0][0] = new Tile([0,1], Treasure.GREEN_EXIT, [players[1]]);
+    this.grid[6][0] = new Tile([0,3], Treasure.BLUE_EXIT, [players[2]]);
+    this.grid[0][6] = new Tile([1,2], Treasure.YELLOW_EXIT, [players[3]]);
+    this.grid[6][6] = new Tile([2,3], Treasure.RED_EXIT, [players[4]]);
 
-    grid[2][0] = new Tile([0,1,3], Treasure.CANDELABRA);
-    grid[4][0] = new Tile([0,1,3], Treasure.HELMET);
-    grid[0][2] = new Tile([0,1,2], Treasure.RING);
-    grid[2][2] = new Tile([0,1,3], Treasure.CHEST);
-    grid[4][2] = new Tile([0,2,3], Treasure.GEM);
-    grid[6][2] = new Tile([0,2,3], Treasure.SWORD);
-    grid[0][4] = new Tile([0,1,2], Treasure.MAP);
-    grid[2][4] = new Tile([0,1,2], Treasure.CROWN);
-    grid[4][4] = new Tile([1,2,3], Treasure.KEYS);
-    grid[6][4] = new Tile([0,2,3], Treasure.SKULL);
-    grid[2][6] = new Tile([1,2,3], Treasure.BOOK);
-    grid[4][6] = new Tile([1,2,3], Treasure.PURSE);
+    this.grid[2][0] = new Tile([0,1,3], Treasure.CANDELABRA);
+    this.grid[4][0] = new Tile([0,1,3], Treasure.HELMET);
+    this.grid[0][2] = new Tile([0,1,2], Treasure.RING);
+    this.grid[2][2] = new Tile([0,1,3], Treasure.CHEST);
+    this.grid[4][2] = new Tile([0,2,3], Treasure.GEM);
+    this.grid[6][2] = new Tile([0,2,3], Treasure.SWORD);
+    this.grid[0][4] = new Tile([0,1,2], Treasure.MAP);
+    this.grid[2][4] = new Tile([0,1,2], Treasure.CROWN);
+    this.grid[4][4] = new Tile([1,2,3], Treasure.KEYS);
+    this.grid[6][4] = new Tile([0,2,3], Treasure.SKULL);
+    this.grid[2][6] = new Tile([1,2,3], Treasure.BOOK);
+    this.grid[4][6] = new Tile([1,2,3], Treasure.PURSE);
 
     _.each(_.range(self.length), function(x) {
         _.each(_.range(self.length), function(y) {
-            if (typeof grid[x][y] === 'undefined') {
-                grid[x][y] = bag.getTile();
+            if (typeof self.grid[x][y] === 'undefined') {
+                self.grid[x][y] = bag.get();
             }
         });
     });
 
-    this.get = function(x, y) {
-        return grid[x][y];
+    var get = function(x, y) {
+        return self.grid[x][y];
     };
 
-    this.whereIsTreasure = function(symbol) {
+    var whereIsTreasure = function(symbol) {
         var result = null;
         _.each(_.range(self.length), function(x) {
             _.each(_.range(self.length), function(y) {
-                if (grid[x][y].treasure.symbol == symbol) {
+                if (self.grid[x][y].getTreasure().symbol == symbol) {
                     result = {x: x, y: y};
                 }
             });
@@ -55,21 +56,19 @@ function Board(bag, players) {
         return result;
     };
 
-    this.whereIsPlayer = function(id) {
+    var whereIsPlayer = function(id) {
         var result = null;
         _.each(_.range(self.length), function(x) {
             _.each(_.range(self.length), function(y) {
-                _.each(grid[x][y].players, function(player) {
-                    if (player.id == id) {
-                        result = {x: x, y: y};
-                    }
-                });
+                if (self.grid[x][y].getPlayer(id)) {
+                    result = {x: x, y: y};
+                }
             });
         });
         return result;
     };
 
-    this.whereCanIGo = function(x, y) {
+    var whereCanIGo = function(x, y) {
 
         var resultCoords = [],
             accessibleTiles = [],
@@ -88,7 +87,7 @@ function Board(bag, players) {
         while (unexploredCoords.length != 0) {
 
             coords = unexploredCoords.pop();
-            var tile = grid[coords.x][coords.y];
+            var tile = self.grid[coords.x][coords.y];
             if (tileSeen(tile)) {
                 continue;
             }
@@ -97,8 +96,8 @@ function Board(bag, players) {
                 nextCoords;
 
             //up
-            if (coords.y < self.length - 1 && _.contains(tile.exits, 0) && _.contains(grid[coords.x][coords.y + 1].exits, 2)) {
-                neighbour = grid[coords.x][coords.y + 1];
+            if (coords.y < self.length - 1 && tile.hasExit(0) && self.grid[coords.x][coords.y + 1].hasExit(2)) {
+                neighbour = self.grid[coords.x][coords.y + 1];
                 if (!tileSeen(neighbour)) {
                     nextCoords = {x: coords.x, y: coords.y + 1};
                     resultCoords.push(nextCoords);
@@ -107,8 +106,8 @@ function Board(bag, players) {
             }
 
             //down
-            if (coords.y > 0 && _.contains(tile.exits, 2) && _.contains(grid[coords.x][coords.y - 1].exits, 0)) {
-                neighbour = grid[coords.x][coords.y - 1];
+            if (coords.y > 0 && tile.hasExit(2) && self.grid[coords.x][coords.y - 1].hasExit(0)) {
+                neighbour = self.grid[coords.x][coords.y - 1];
                 if (!tileSeen(neighbour)) {
                     nextCoords = {x: coords.x, y: coords.y - 1};
                     resultCoords.push(nextCoords);
@@ -117,8 +116,8 @@ function Board(bag, players) {
             }
 
             //left
-            if (coords.x > 0 && _.contains(tile.exits, 3) && _.contains(grid[coords.x - 1][coords.y].exits, 1)) {
-                neighbour = grid[coords.x - 1][coords.y];
+            if (coords.x > 0 && tile.hasExit(3) && self.grid[coords.x - 1][coords.y].hasExit(1)) {
+                neighbour = self.grid[coords.x - 1][coords.y];
                 if (!tileSeen(neighbour)) {
                     nextCoords = {x: coords.x - 1, y: coords.y};
                     resultCoords.push(nextCoords);
@@ -127,8 +126,8 @@ function Board(bag, players) {
             }
 
             //right
-            if (coords.x < self.length - 1 && _.contains(tile.exits, 1) && _.contains(grid[coords.x + 1][coords.y].exits, 3)) {
-                neighbour = grid[coords.x + 1][coords.y];
+            if (coords.x < self.length - 1 && tile.hasExit(1) && self.grid[coords.x + 1][coords.y].hasExit(3)) {
+                neighbour = self.grid[coords.x + 1][coords.y];
                 if (!tileSeen(neighbour)) {
                     nextCoords = {x: coords.x + 1, y: coords.y};
                     resultCoords.push(nextCoords);
@@ -142,105 +141,109 @@ function Board(bag, players) {
         return resultCoords;
     };
 
-    this.isPlayable = function (x, y) {
+    var isPlayable = function (x, y) {
         var onRight = x == 0,
-            onLeft = x == this.length - 1,
+            onLeft = x == self.length - 1,
             onBottom = y == 0,
-            onTop = y == this.length -1;
+            onTop = y == self.length -1;
 
-        if (!(onBottom || onTop ||onRight || onLeft)) {
-            console.log("Illegal move. Must be on board edge.");
-            return false;
+        if (!(onBottom || onTop || onRight || onLeft)) {
+            return {isPlayable: false, message: "Must be on board edge"};
         }
 
-        if (onBottom) {
+        if (onBottom || onTop) {
             if (x % 2 == 0) {
-                console.log("Illegal move. Must be on odd column.");
-                return false;
+                return {isPlayable: false, message: "Must be on odd column"};
+            }
+
+            if (x == self.previousPlay.x && y != self.previousPlay.y) {
+                return {isPlayable: false, message: "You cannot negate the previous turn"};
             }
         }
 
-        if (onTop) {
-            if (x % 2 == 0) {
-                console.log("Illegal move. Must be on odd column.");
-                return false;
-            }
-        }
-
-        if (onRight) {
+        if (onRight || onLeft) {
             if (y % 2 == 0) {
-                console.log("Illegal move. Must be on odd row.");
-                return false;
+                return {isPlayable: false, message: "Must be on odd row"};
+            }
+
+            if (y == self.previousPlay.y && x != self.previousPlay.x) {
+                return {isPlayable: false, message: "You cannot negate the previous turn"};
             }
         }
 
-        if (onLeft) {
-            if (y % 2 == 0) {
-                console.log("Illegal move. Must be on odd row.");
-                return false;
-            }
-        }
-
-        return true;
+        return {isPlayable: true, message: 'OK'};
     };
 
-    this.play = function (x, y, tile) {
+    var play = function (x, y, tile) {
 
-        if (!self.isPlayable(x, y)) {
-            throw new Error("Illegal move");
+        var playability = isPlayable(x, y);
+        if (!playability.isPlayable) {
+            throw new Error("Illegal move: " + playability.message);
         }
 
         var onRight = x == 0,
-            onLeft = x == this.length - 1,
+            onLeft = x == self.length - 1,
             onBottom = y == 0,
-            onTop = y == this.length -1,
+            onTop = y == self.length -1,
             spare = null;
 
         if (onBottom) {
-            spare = grid[x][this.length - 1];
+            spare = self.grid[x][self.length - 1];
 
-            _.forEach(_.range(this.length - 1, 0, -1), function(y) {
-                grid[x][y] = grid[x][y-1];
+            _.forEach(_.range(self.length - 1, 0, -1), function(y) {
+                self.grid[x][y] = self.grid[x][y-1];
             });
 
-            grid[x][0] = tile;
+            self.grid[x][0] = tile;
         }
 
         if (onTop) {
-            spare = grid[x][0];
+            spare = self.grid[x][0];
 
-            _.forEach(_.range(0, this.length - 1, +1), function(y) {
-                grid[x][y] = grid[x][y+1];
+            _.forEach(_.range(0, self.length - 1, +1), function(y) {
+                self.grid[x][y] = self.grid[x][y+1];
             });
 
-            grid[x][this.length - 1] = tile;
+            self.grid[x][self.length - 1] = tile;
         }
 
         if (onRight) {
-            spare = grid[this.length - 1][y];
+            spare = self.grid[self.length - 1][y];
 
-            _.forEach(_.range(this.length - 1, 0, -1), function(x) {
-                grid[x][y] = grid[x-1][y];
+            _.forEach(_.range(self.length - 1, 0, -1), function(x) {
+                self.grid[x][y] = self.grid[x-1][y];
             });
 
-            grid[0][y] = tile;
+            self.grid[0][y] = tile;
         }
 
         if (onLeft) {
-            spare = grid[0][y];
+            spare = self.grid[0][y];
 
-            _.forEach(_.range(0, this.length - 1, +1), function(x) {
-                grid[x][y] = grid[x+1][y];
+            _.forEach(_.range(0, self.length - 1, +1), function(x) {
+                self.grid[x][y] = self.grid[x+1][y];
             });
 
-            grid[this.length - 1][y] = tile;
+            self.grid[self.length - 1][y] = tile;
         }
 
         tile.setPlayers(spare.getPlayers());
         spare.setPlayers({});
 
+        self.previousPlay = {x: x, y: y};
+
         return spare;
     };
+
+    return {
+        get: get,
+        whereIsTreasure: whereIsTreasure,
+        whereIsPlayer: whereIsPlayer,
+        whereCanIGo: whereCanIGo,
+        isPlayable: isPlayable,
+        play: play,
+        length: this.length
+    }
 }
 
 module.exports = Board;

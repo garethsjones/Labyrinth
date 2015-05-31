@@ -3,7 +3,7 @@ var _ = require('lodash');
 var Treasures = require('./Treasures'),
     Tile = require('./Tile');
 
-function Bag() {
+function TileBag() {
     var tiles = [];
 
     // T junctions
@@ -39,21 +39,34 @@ function Bag() {
     });
     tiles = _.shuffle(tiles);
 
-    this.peekTile = function() {
+    var peek = function() {
+        if (count() === 0) {
+            throw new Error('No tiles left in bag');
+        }
         return tiles[0];
     };
 
-    this.getTile = function() {
+    var get = function() {
+        if (count() === 0){
+            throw new Error('No tiles left in bag');
+        }
         return tiles.pop();
     };
 
-    this.putTile = function(tile) {
+    var put = function(tile) {
         tiles.push(tile);
     };
 
-    this.count = function() {
+    var count = function() {
         return tiles.length;
+    };
+
+    return {
+        count: count,
+        peek: peek,
+        get: get,
+        put: put,
     }
 }
 
-module.exports = Bag;
+module.exports = TileBag;

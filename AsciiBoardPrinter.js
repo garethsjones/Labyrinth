@@ -93,12 +93,12 @@ function treasureSpace(treasure) {
 }
 
 function wizard(player) {
-    if (!player.isActive) {
+    if (!player.isActive()) {
         return wall();
     }
 
-    var s = player.symbol;
-    var colour = player.colour;
+    var s = player.getSymbol();
+    var colour = player.getColour();
 
     switch (colour) {
         case 'red':
@@ -170,19 +170,19 @@ function printGrid(board, highlightCoords, highlightColour) {
 
                 switch (pass) {
                     case 0:
-                        tile.players[3] ? wizard(tile.players[3]) : wall();
-                        _.includes(tile.exits, 0) ? space(spaceColour) : wall();
-                        tile.players[4] ? wizard(tile.players[4]) : wall();
+                        tile.getPlayer(3) ? wizard(tile.getPlayer(3)) : wall();
+                        tile.hasExit(0) ? space(spaceColour) : wall();
+                        tile.getPlayer(4) ? wizard(tile.getPlayer(4)) : wall();
                         break;
                     case 1:
-                        _.includes(tile.exits, 3) ? space(spaceColour) : wall();
-                        board.get(x, y).treasure == treasure.EMPTY ? space(spaceColour) : treasureSpace(tile.treasure);
-                        _.includes(tile.exits, 1) ? space(spaceColour) : wall();
+                        tile.hasExit(3) ? space(spaceColour) : wall();
+                        board.get(x, y).getTreasure() == treasure.EMPTY ? space(spaceColour) : treasureSpace(tile.getTreasure());
+                        tile.hasExit(1) ? space(spaceColour) : wall();
                         break;
                     case 2:
-                        tile.players[1] ? wizard(tile.players[1]) : wall();
-                        _.includes(tile.exits, 2) ? space(spaceColour) : wall();
-                        tile.players[2] ? wizard(tile.players[2]) : wall();
+                        tile.getPlayer(1) ? wizard(tile.getPlayer(1)) : wall();
+                        tile.hasExit(2) ? space(spaceColour) : wall();
+                        tile.getPlayer(2) ? wizard(tile.getPlayer(2)) : wall();
                         break;
                 }
                 pipe();
@@ -195,7 +195,7 @@ function printGrid(board, highlightCoords, highlightColour) {
 
 function printTile(tile) {
 
-    var exits = tile.exits;
+    var exits = tile.getExits();
 
     function hr() {
         wall();
@@ -219,7 +219,7 @@ function printTile(tile) {
                 break;
             case 1:
                 _.includes(exits, 3) ? space() : wall();
-                tile.treasure == treasure.EMPTY ? space() : treasureSpace(tile.treasure);
+                tile.getTreasure() == treasure.EMPTY ? space() : treasureSpace(tile.getTreasure());
                 _.includes(exits, 1) ? space() : wall();
                 break;
             case 2:

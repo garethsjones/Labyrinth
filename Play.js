@@ -1,8 +1,9 @@
 var _ = require('lodash'),
     sys = require('sys'),
+    //winsay = require('winsay'),
     stdin = process.openStdin();
 
-var Bag = require('./Bag'),
+var Bag = require('./TileBag'),
     Board = require('./Board'),
     Deck = require('./Deck'),
     Player = require('./Player'),
@@ -20,10 +21,10 @@ var player1 = new Player(1, 'green'),
     player4 = new Player(4, 'red');
 
 var players = {};
-players[1] = player1;
+//players[1] = player1;
 players[2] = player2;
 players[3] = player3;
-players[4] = player4;
+//players[4] = player4;
 
 _.forEach(players, function(player) {
     player.assignCard(deck.deal());
@@ -32,6 +33,11 @@ _.forEach(players, function(player) {
 var board = new Board(bag, players);
 
 var player = players[_.keys(players)[turn]];
+
+function say(s) {
+    console.log(s);
+    //winsay.speakSync("GLaDOS", s);
+}
 
 function print() {
     var coords = board.whereIsPlayer(player.id);
@@ -46,30 +52,30 @@ function print() {
     console.log('Next piece:');
     Printer.printTile(bag.peekTile());
     console.log();
-    console.log('What\'s up ' + player.colour + '?');
+    say('What\'s up ' + player.colour + '?');
     if (treasureCoords != null) {
-        console.log('You\'re looking for the ' + player.card.desc + ' (' + player.card.symbol + ") which is at " + treasureCoords.x + "," + treasureCoords.y);
+        say('You\'re looking for the ' + player.card.desc + ' (' + player.card.symbol + ") which is at " + treasureCoords.x + "," + treasureCoords.y);
     } else {
         if (bag.peekTile().treasure.symbol == player.card.symbol) {
-            console.log('You\'re looking for the ' + player.card.desc + ' (' + player.card.symbol + ") which is at on the spare tile");
+            say('You\'re looking for the ' + player.card.desc + ' (' + player.card.symbol + ") which is on the spare tile");
         } else {
-            console.log('The treasure you\'re looking is nowhere to be found');
+            say('The treasure you\'re looking is nowhere to be found');
         }
     }
 
-    console.log('You\'re at ' + coords.x + ',' + coords.y);
+    say('You\'re at ' + coords.x + ',' + coords.y);
 
     if (phase == 'play') {
-        console.log("Where do you want to play the tile?");
+        say("Where do you want to play the tile?");
     }
 
     if (phase == 'move') {
-        console.log("You can go:");
+        say("You can go:");
         var s = "";
         _.forEach(availableCoords, function(coords) {
             s += coords.x + ',' + coords.y + ' ';
         });
-        console.log(s);
+        say(s);
     }
 }
 
@@ -109,9 +115,9 @@ stdin.addListener("data", function(input) {
             var playerId = match[1];
             coords = board.whereIsPlayer(match[1]);
             if (coords != null) {
-                console.log('Player ' + playerId + ' is at ' + coords.x + ',' + coords.y);
+                say('Player ' + playerId + ' is at ' + coords.x + ',' + coords.y);
             } else {
-                console.log('Player ' + playerId + ' not found');
+                say('Player ' + playerId + ' not found');
             }
             break;
         case /treasure (\w+)/.test(input):
@@ -119,12 +125,12 @@ stdin.addListener("data", function(input) {
             var treasureSymbol = match[1];
             coords = board.whereIsTreasure(treasureSymbol);
             if (coords != null) {
-                console.log('Treasure ' + treasureSymbol + ' is at ' + coords.x + ',' + coords.y);
+                say('Treasure ' + treasureSymbol + ' is at ' + coords.x + ',' + coords.y);
             } else {
                 if (bag.peekTile().treasure.symbol == treasureSymbol) {
-                    console.log('Treasure ' + treasureSymbol + ' is on the spare tile');
+                    say('Treasure ' + treasureSymbol + ' is on the spare tile');
                 } else {
-                    console.log('Treasure ' + treasureSymbol + ' not found');
+                    say('Treasure ' + treasureSymbol + ' not found');
                 }
             }
             break;
@@ -140,10 +146,10 @@ stdin.addListener("data", function(input) {
                     phase = 'move';
                     print();
                 } else {
-                    console.log("You can't play the tile there");
+                    say("You can't play the tile there");
                 }
             } else {
-                console.log("You can't play a tile at the moment");
+                say("You can't play a tile at the moment");
             }
             break;
         case /move (\d+),(\d+)/.test(input):
@@ -162,7 +168,7 @@ stdin.addListener("data", function(input) {
                 });
 
                 if (!legal) {
-                    console.log("You can't move to " + match[1] + "," + match[2]);
+                    say("You can't move to " + match[1] + "," + match[2]);
                     break;
                 }
 
@@ -171,17 +177,16 @@ stdin.addListener("data", function(input) {
 
                 if (board.get(x, y).treasure.symbol == player.card.symbol) {
                     if (player.treasureCount < TREASURES_TO_WIN - 1) {
-                        console.log("You've picked up the " + player.card.desc);
+                        say("You've picked up the " + player.card.desc);
                         player.assignCard(deck.deal());
-                        console.log("You have found " + player.treasureCount + " treasures");
+                        say("You have found " + player.treasureCount + " treasure" + (player.treasureCount == 1 ? "" : "s"));
                     } else if (player.treasureCount == TREASURES_TO_WIN - 1) {
-                        console.log("You've picked up the " + player.card.desc);
+                        say("You've picked up the " + player.card.desc);
                         player.assignCard(deck.exits[player.id]);
-                        console.log("Time to race for home!!");
+                        say("Time to race for home!!");
                     } else {
-                        console.log("You've won!!!!!!!!!!!!!!!!!");
+                        say("You've won!!!!!!!!!!!!!!!!!");
                         process.exit();
-
                     }
                 }
 
@@ -190,11 +195,11 @@ stdin.addListener("data", function(input) {
                 phase = 'play';
                 print();
             } else {
-                console.log("You can't move right now");
+                say("You can't move right now");
             }
             break;
         default:
-            console.log("I don't know how to " + input);
+            say("I don't know how to " + input);
             return;
     }
 });
