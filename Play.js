@@ -3,13 +3,13 @@ var _ = require('lodash'),
     //winsay = require('winsay'),
     stdin = process.openStdin();
 
-var Bag = require('./TileBag'),
+var TileBag = require('./TileBag'),
     Board = require('./Board'),
     Deck = require('./Deck'),
     Player = require('./Player'),
     Printer = require('./AsciiBoardPrinter');
 
-var bag = new Bag(),
+var bag = new TileBag(),
     deck = new Deck(),
     TREASURES_TO_WIN = 3,
     turn = 0,
@@ -21,10 +21,10 @@ var player1 = new Player(1, 'green'),
     player4 = new Player(4, 'red');
 
 var players = {};
-//players[1] = player1;
+players[1] = player1;
 players[2] = player2;
 players[3] = player3;
-//players[4] = player4;
+players[4] = player4;
 
 _.forEach(players, function(player) {
     player.assignCard(deck.deal());
@@ -40,24 +40,24 @@ function say(s) {
 }
 
 function print() {
-    var coords = board.whereIsPlayer(player.id);
-    var treasureCoords = board.whereIsTreasure(player.card.symbol);
+    var coords = board.whereIsPlayer(player.getId());
+    var treasureCoords = board.whereIsTreasure(player.getCard().symbol);
     var availableCoords = [];
     if (coords != null) {
         availableCoords = board.whereCanIGo(coords.x, coords.y);
     }
     console.log('Board:');
-    Printer.printGrid(board, availableCoords, player.colour);
+    Printer.printGrid(board, availableCoords, player.getColour());
     console.log();
     console.log('Next piece:');
-    Printer.printTile(bag.peekTile());
+    Printer.printTile(bag.peek());
     console.log();
-    say('What\'s up ' + player.colour + '?');
+    say('What\'s up ' + player.getColour() + '?');
     if (treasureCoords != null) {
-        say('You\'re looking for the ' + player.card.desc + ' (' + player.card.symbol + ") which is at " + treasureCoords.x + "," + treasureCoords.y);
+        say('You\'re looking for the ' + player.getCard().desc + ' (' + player.getCard().symbol + ") which is at " + treasureCoords.x + "," + treasureCoords.y);
     } else {
-        if (bag.peekTile().treasure.symbol == player.card.symbol) {
-            say('You\'re looking for the ' + player.card.desc + ' (' + player.card.symbol + ") which is on the spare tile");
+        if (bag.peek().getTreasure().symbol == player.getCard().symbol) {
+            say('You\'re looking for the ' + player.getCard().desc + ' (' + player.getCard().symbol + ") which is on the spare tile");
         } else {
             say('The treasure you\'re looking is nowhere to be found');
         }
@@ -98,17 +98,17 @@ stdin.addListener("data", function(input) {
         case /turn/.test(input):
         case /turnr/.test(input):
         case /turnc/.test(input):
-            bag.peekTile().turn(1);
-            Printer.printTile(bag.peekTile());
+            bag.peek().turn(1);
+            Printer.printTile(bag.peek());
             break;
         case /turnl/.test(input):
         case /turna/.test(input):
-            bag.peekTile().turn(3);
-            Printer.printTile(bag.peekTile());
+            bag.peek().turn(3);
+            Printer.printTile(bag.peek());
             break;
         case /flip/.test(input):
-            bag.peekTile().turn(2);
-            Printer.printTile(bag.peekTile());
+            bag.peek().turn(2);
+            Printer.printTile(bag.peek());
             break;
         case /player (\d+)/.test(input):
             match = /player (\d+)/.exec(input);
@@ -127,7 +127,7 @@ stdin.addListener("data", function(input) {
             if (coords != null) {
                 say('Treasure ' + treasureSymbol + ' is at ' + coords.x + ',' + coords.y);
             } else {
-                if (bag.peekTile().treasure.symbol == treasureSymbol) {
+                if (bag.peek().treasure.symbol == treasureSymbol) {
                     say('Treasure ' + treasureSymbol + ' is on the spare tile');
                 } else {
                     say('Treasure ' + treasureSymbol + ' not found');
@@ -141,8 +141,8 @@ stdin.addListener("data", function(input) {
                 y = match[2];
                 legal = board.isPlayable(x, y);
                 if (legal) {
-                    var tile = board.play(x, y, bag.getTile());
-                    bag.putTile(tile);
+                    var tile = board.play(x, y, bag.get());
+                    bag.put(tile);
                     phase = 'move';
                     print();
                 } else {
@@ -157,7 +157,7 @@ stdin.addListener("data", function(input) {
                 match = /move (\d+),(\d+)/.exec(input);
                 x = match[1];
                 y = match[2];
-                coords = board.whereIsPlayer(player.id);
+                coords = board.whereIsPlayer(player.getId());
                 var availableCoords = board.whereCanIGo(coords.x, coords.y);
 
                 legal = false;
@@ -175,14 +175,14 @@ stdin.addListener("data", function(input) {
                 board.get(coords.x, coords.y).removePlayer(player.id);
                 board.get(x, y).addPlayer(player);
 
-                if (board.get(x, y).treasure.symbol == player.card.symbol) {
-                    if (player.treasureCount < TREASURES_TO_WIN - 1) {
-                        say("You've picked up the " + player.card.desc);
+                if (board.get(x, y).getTreasure().symbol == player.getCard().symbol) {
+                    if (player.getTreasureCount() < TREASURES_TO_WIN - 1) {
+                        say("You've picked up the " + player.getCard().desc);
                         player.assignCard(deck.deal());
-                        say("You have found " + player.treasureCount + " treasure" + (player.treasureCount == 1 ? "" : "s"));
-                    } else if (player.treasureCount == TREASURES_TO_WIN - 1) {
-                        say("You've picked up the " + player.card.desc);
-                        player.assignCard(deck.exits[player.id]);
+                        say("You have found " + player.getTreasureCount() + " treasure" + (player.treasureCount == 1 ? "" : "s"));
+                    } else if (player.getTreasureCount() == TREASURES_TO_WIN - 1) {
+                        say("You've picked up the " + player.getCard().desc);
+                        player.assignCard(deck.exits[player.getId()]);
                         say("Time to race for home!!");
                     } else {
                         say("You've won!!!!!!!!!!!!!!!!!");
