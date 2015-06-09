@@ -1,6 +1,6 @@
 var should = require("chai").should();
 
-var Player = require('../Player');
+var Player = require('../Player').Player;
 
 describe('Player', function(){
 

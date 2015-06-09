@@ -2,9 +2,9 @@ var should = require("chai").should(),
     expect = require("chai").expect,
     _ = require("lodash");
 
-var Tile = require('../Tile'),
-    Treasures = require('../Treasures'),
-    Player = require('../Player');
+var Tile = require('../Tile').Tile,
+    Treasures = require('../Treasures').Treasures,
+    Player = require('../Player').Player;
 
 describe('Tile', function(){
 

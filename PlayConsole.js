@@ -1,12 +1,11 @@
 var _ = require('lodash'),
     sys = require('sys'),
-    //winsay = require('winsay'),
     stdin = process.openStdin();
 
-var TileBag = require('./TileBag'),
-    Board = require('./Board'),
-    Deck = require('./Deck'),
-    Player = require('./Player'),
+var TileBag = require('./TileBag').TileBag,
+    Board = require('./Board').Board,
+    Deck = require('./Deck').Deck,
+    Player = require('./Player').Player,
     Printer = require('./AsciiBoardPrinter');
 
 var bag = new TileBag(),
@@ -36,7 +35,6 @@ var player = players[_.keys(players)[turn]];
 
 function say(s) {
     console.log(s);
-    //winsay.speakSync("GLaDOS", s);
 }
 
 function print() {
@@ -179,7 +177,7 @@ stdin.addListener("data", function(input) {
                     if (player.getTreasureCount() < TREASURES_TO_WIN - 1) {
                         say("You've picked up the " + player.getCard().desc);
                         player.assignCard(deck.deal());
-                        say("You have found " + player.getTreasureCount() + " treasure" + (player.treasureCount == 1 ? "" : "s"));
+                        say("You have found " + player.getTreasureCount() + " Treasures" + (player.treasureCount == 1 ? "" : "s"));
                     } else if (player.getTreasureCount() == TREASURES_TO_WIN - 1) {
                         say("You've picked up the " + player.getCard().desc);
                         player.assignCard(deck.exits[player.getId()]);

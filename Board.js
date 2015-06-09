@@ -1,44 +1,86 @@
 var _ = require('lodash');
 
-var Tile = require('./Tile'),
-    Treasure = require('./Treasures');
+var TILE = require('./Tile'),
+    Tile = TILE.Tile,
+    Treasure = require('./Treasures').Treasures;
+
+var FROM_STATE = 'FROM_STATE',
+    LENGTH = 7;
+
+function fromState(state){
+    return new Board(FROM_STATE, state);
+}
 
 function Board(bag, players) {
 
     var self = this;
-    this.grid = [];
-    this.length = 7;
-    this.previousPlay = {x: null, y: null};
 
-    _.each(_.range(self.length), function(x) {
-        self.grid[x] = [];
-    });
+    if (bag === FROM_STATE) {
+        var state = players;
+        self.previousPlay = state.previousPlay;
+        self.grid = [];
 
-    this.grid[0][0] = new Tile([0,1], Treasure.GREEN_EXIT, [players[1]]);
-    this.grid[6][0] = new Tile([0,3], Treasure.BLUE_EXIT, [players[2]]);
-    this.grid[0][6] = new Tile([1,2], Treasure.YELLOW_EXIT, [players[3]]);
-    this.grid[6][6] = new Tile([2,3], Treasure.RED_EXIT, [players[4]]);
-
-    this.grid[2][0] = new Tile([0,1,3], Treasure.CANDELABRA);
-    this.grid[4][0] = new Tile([0,1,3], Treasure.HELMET);
-    this.grid[0][2] = new Tile([0,1,2], Treasure.RING);
-    this.grid[2][2] = new Tile([0,1,3], Treasure.CHEST);
-    this.grid[4][2] = new Tile([0,2,3], Treasure.GEM);
-    this.grid[6][2] = new Tile([0,2,3], Treasure.SWORD);
-    this.grid[0][4] = new Tile([0,1,2], Treasure.MAP);
-    this.grid[2][4] = new Tile([0,1,2], Treasure.CROWN);
-    this.grid[4][4] = new Tile([1,2,3], Treasure.KEYS);
-    this.grid[6][4] = new Tile([0,2,3], Treasure.SKULL);
-    this.grid[2][6] = new Tile([1,2,3], Treasure.BOOK);
-    this.grid[4][6] = new Tile([1,2,3], Treasure.PURSE);
-
-    _.each(_.range(self.length), function(x) {
-        _.each(_.range(self.length), function(y) {
-            if (typeof self.grid[x][y] === 'undefined') {
-                self.grid[x][y] = bag.get();
-            }
+        _.each(_.range(LENGTH), function(x){
+            self.grid[x] = [];
         });
-    });
+
+        _.each(_.range(LENGTH), function(x) {
+            _.each(_.range(LENGTH), function(y) {
+                self.grid[x][y] = TILE.fromState(state.grid[x][y]);
+            });
+        });
+    } else {
+        this.grid = [];
+        this.previousPlay = {x: null, y: null};
+
+        _.each(_.range(LENGTH), function(x) {
+            self.grid[x] = [];
+        });
+
+        this.grid[0][0] = new Tile([0,1], Treasure.GREEN_EXIT, [players[1]]);
+        this.grid[6][0] = new Tile([0,3], Treasure.BLUE_EXIT, [players[2]]);
+        this.grid[0][6] = new Tile([1,2], Treasure.YELLOW_EXIT, [players[3]]);
+        this.grid[6][6] = new Tile([2,3], Treasure.RED_EXIT, [players[4]]);
+
+        this.grid[2][0] = new Tile([0,1,3], Treasure.CANDELABRA);
+        this.grid[4][0] = new Tile([0,1,3], Treasure.HELMET);
+        this.grid[0][2] = new Tile([0,1,2], Treasure.RING);
+        this.grid[2][2] = new Tile([0,1,3], Treasure.CHEST);
+        this.grid[4][2] = new Tile([0,2,3], Treasure.GEM);
+        this.grid[6][2] = new Tile([0,2,3], Treasure.SWORD);
+        this.grid[0][4] = new Tile([0,1,2], Treasure.MAP);
+        this.grid[2][4] = new Tile([0,1,2], Treasure.CROWN);
+        this.grid[4][4] = new Tile([1,2,3], Treasure.KEYS);
+        this.grid[6][4] = new Tile([0,2,3], Treasure.SKULL);
+        this.grid[2][6] = new Tile([1,2,3], Treasure.BOOK);
+        this.grid[4][6] = new Tile([1,2,3], Treasure.PURSE);
+
+        _.each(_.range(LENGTH), function(x) {
+            _.each(_.range(LENGTH), function(y) {
+                if (typeof self.grid[x][y] === 'undefined') {
+                    self.grid[x][y] = bag.get();
+                }
+            });
+        });
+    }
+
+    var getState = function(){
+
+        var state = {};
+        state.previousPlay = self.previousPlay;
+        state.grid = [];
+        _.each(_.range(LENGTH), function(x){
+            state.grid[x] = [];
+        });
+
+        _.each(_.range(LENGTH), function(x) {
+            _.each(_.range(LENGTH), function(y) {
+                state.grid[x][y] = self.grid[x][y].getState();
+            });
+        });
+
+        return state;
+    };
 
     var get = function(x, y) {
         return self.grid[x][y];
@@ -46,8 +88,8 @@ function Board(bag, players) {
 
     var whereIsTreasure = function(symbol) {
         var result = null;
-        _.each(_.range(self.length), function(x) {
-            _.each(_.range(self.length), function(y) {
+        _.each(_.range(LENGTH), function(x) {
+            _.each(_.range(LENGTH), function(y) {
                 if (self.grid[x][y].getTreasure().symbol == symbol) {
                     result = {x: x, y: y};
                 }
@@ -58,8 +100,8 @@ function Board(bag, players) {
 
     var whereIsPlayer = function(id) {
         var result = null;
-        _.each(_.range(self.length), function(x) {
-            _.each(_.range(self.length), function(y) {
+        _.each(_.range(LENGTH), function(x) {
+            _.each(_.range(LENGTH), function(y) {
                 if (self.grid[x][y].getPlayer(id)) {
                     result = {x: x, y: y};
                 }
@@ -96,7 +138,7 @@ function Board(bag, players) {
                 nextCoords;
 
             //up
-            if (coords.y < self.length - 1 && tile.hasExit(0) && self.grid[coords.x][coords.y + 1].hasExit(2)) {
+            if (coords.y < LENGTH - 1 && tile.hasExit(0) && self.grid[coords.x][coords.y + 1].hasExit(2)) {
                 neighbour = self.grid[coords.x][coords.y + 1];
                 if (!tileSeen(neighbour)) {
                     nextCoords = {x: coords.x, y: coords.y + 1};
@@ -126,7 +168,7 @@ function Board(bag, players) {
             }
 
             //right
-            if (coords.x < self.length - 1 && tile.hasExit(1) && self.grid[coords.x + 1][coords.y].hasExit(3)) {
+            if (coords.x < LENGTH - 1 && tile.hasExit(1) && self.grid[coords.x + 1][coords.y].hasExit(3)) {
                 neighbour = self.grid[coords.x + 1][coords.y];
                 if (!tileSeen(neighbour)) {
                     nextCoords = {x: coords.x + 1, y: coords.y};
@@ -143,9 +185,9 @@ function Board(bag, players) {
 
     var isPlayable = function (x, y) {
         var onRight = x == 0,
-            onLeft = x == self.length - 1,
+            onLeft = x == LENGTH - 1,
             onBottom = y == 0,
-            onTop = y == self.length -1;
+            onTop = y == LENGTH -1;
 
         if (!(onBottom || onTop || onRight || onLeft)) {
             return {isPlayable: false, message: "Must be on board edge"};
@@ -182,15 +224,15 @@ function Board(bag, players) {
         }
 
         var onRight = x == 0,
-            onLeft = x == self.length - 1,
+            onLeft = x == LENGTH - 1,
             onBottom = y == 0,
-            onTop = y == self.length -1,
+            onTop = y == LENGTH -1,
             spare = null;
 
         if (onBottom) {
-            spare = self.grid[x][self.length - 1];
+            spare = self.grid[x][LENGTH - 1];
 
-            _.forEach(_.range(self.length - 1, 0, -1), function(y) {
+            _.forEach(_.range(LENGTH - 1, 0, -1), function(y) {
                 self.grid[x][y] = self.grid[x][y-1];
             });
 
@@ -200,17 +242,17 @@ function Board(bag, players) {
         if (onTop) {
             spare = self.grid[x][0];
 
-            _.forEach(_.range(0, self.length - 1, +1), function(y) {
+            _.forEach(_.range(0, LENGTH - 1, +1), function(y) {
                 self.grid[x][y] = self.grid[x][y+1];
             });
 
-            self.grid[x][self.length - 1] = tile;
+            self.grid[x][LENGTH - 1] = tile;
         }
 
         if (onRight) {
-            spare = self.grid[self.length - 1][y];
+            spare = self.grid[LENGTH - 1][y];
 
-            _.forEach(_.range(self.length - 1, 0, -1), function(x) {
+            _.forEach(_.range(LENGTH - 1, 0, -1), function(x) {
                 self.grid[x][y] = self.grid[x-1][y];
             });
 
@@ -220,11 +262,11 @@ function Board(bag, players) {
         if (onLeft) {
             spare = self.grid[0][y];
 
-            _.forEach(_.range(0, self.length - 1, +1), function(x) {
+            _.forEach(_.range(0, LENGTH - 1, +1), function(x) {
                 self.grid[x][y] = self.grid[x+1][y];
             });
 
-            self.grid[self.length - 1][y] = tile;
+            self.grid[LENGTH - 1][y] = tile;
         }
 
         tile.setPlayers(spare.getPlayers());
@@ -236,6 +278,7 @@ function Board(bag, players) {
     };
 
     return {
+        getState: getState,
         get: get,
         whereIsTreasure: whereIsTreasure,
         whereIsPlayer: whereIsPlayer,
@@ -246,4 +289,8 @@ function Board(bag, players) {
     }
 }
 
-module.exports = Board;
+module.exports = {
+    Board: Board,
+    fromState: fromState,
+    LENGTH: LENGTH
+};

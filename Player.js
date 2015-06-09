@@ -1,14 +1,28 @@
+var FROM_STATE = 'FROM_STATE';
+
+function fromState(state){
+    return new Player(FROM_STATE, state);
+}
 
 function Player(id, colour) {
 
     var self = this;
-    this.id = id;
-    this.symbol = '' + id;
-    this.colour = colour;
-    this.isActive = true;
 
-    this.card = null;
-    this.treasureCount = 0;
+    if (id === FROM_STATE) {
+        self = colour;
+    } else {
+        this.id = id;
+        this.symbol = '' + id;
+        this.colour = colour;
+        this.isActive = true;
+
+        this.card = null;
+        this.treasureCount = 0;
+    }
+
+    var getState = function(){
+        return self;
+    };
 
     var assignCard = function(card) {
         if (self.card != null) {
@@ -42,6 +56,7 @@ function Player(id, colour) {
     };
 
     return {
+        getState: getState,
         getId: getId,
         getSymbol: getSymbol,
         getColour: getColour,
@@ -52,4 +67,7 @@ function Player(id, colour) {
     }
 }
 
-module.exports = Player;
+module.exports = {
+    Player: Player,
+    fromState: fromState
+};

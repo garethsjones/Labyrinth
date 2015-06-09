@@ -1,72 +1,99 @@
 var _ = require('lodash');
 
-var Treasures = require('./Treasures'),
-    Tile = require('./Tile');
+var Treasures = require('./Treasures').Treasures,
+    TILE = require('./Tile'),
+    Tile = TILE.Tile;
 
-function TileBag() {
-    var tiles = [];
+function fromState(state){
+    return new TileBag(state);
+}
 
-    // T junctions
-    var exits = [0,1,3];
-    tiles.push(new Tile(exits, Treasures.GHOST));
-    tiles.push(new Tile(exits, Treasures.PRINCESS));
-    tiles.push(new Tile(exits, Treasures.DRAGON));
-    tiles.push(new Tile(exits, Treasures.IMP));
-    tiles.push(new Tile(exits, Treasures.GENIE));
-    tiles.push(new Tile(exits, Treasures.BAT));
+function TileBag(state) {
 
-    // Corners
-    exits = [2, 3];
-    tiles.push(new Tile(exits, Treasures.RAT));
-    tiles.push(new Tile(exits, Treasures.MOTH));
-    tiles.push(new Tile(exits, Treasures.LIZARD));
-    tiles.push(new Tile(exits, Treasures.OWL));
-    tiles.push(new Tile(exits, Treasures.SPIDER));
-    tiles.push(new Tile(exits, Treasures.BEETLE));
+    var self = this;
 
-    _.times(10, function() {
-        tiles.push(new Tile(exits));
-    });
+    if (typeof state != 'undefined') {
+        self.tiles = [];
+        _.forEach(state.tiles, function(tile){
+            self.tiles.push(TILE.fromState(tile));
+        })
+    } else {
+        var tiles = [];
 
-    // Straights
-    exits = [0, 2];
-    _.times(12, function() {
-        tiles.push(new Tile(exits));
-    });
+        // T junctions
+        var exits = [0,1,3];
+        tiles.push(new Tile(exits, Treasures.GHOST));
+        tiles.push(new Tile(exits, Treasures.PRINCESS));
+        tiles.push(new Tile(exits, Treasures.DRAGON));
+        tiles.push(new Tile(exits, Treasures.IMP));
+        tiles.push(new Tile(exits, Treasures.GENIE));
+        tiles.push(new Tile(exits, Treasures.BAT));
 
-    _.each(tiles, function(tile) {
-        tile.spin();
-    });
-    tiles = _.shuffle(tiles);
+        // Corners
+        exits = [2, 3];
+        tiles.push(new Tile(exits, Treasures.RAT));
+        tiles.push(new Tile(exits, Treasures.MOTH));
+        tiles.push(new Tile(exits, Treasures.LIZARD));
+        tiles.push(new Tile(exits, Treasures.OWL));
+        tiles.push(new Tile(exits, Treasures.SPIDER));
+        tiles.push(new Tile(exits, Treasures.BEETLE));
+
+        _.times(10, function() {
+            tiles.push(new Tile(exits));
+        });
+
+        // Straights
+        exits = [0, 2];
+        _.times(12, function() {
+            tiles.push(new Tile(exits));
+        });
+
+        _.each(self.tiles, function(tile) {
+            tile.spin();
+        });
+        this.tiles = _.shuffle(tiles);
+    }
+
+    var getState = function(){
+        var tiles = [];
+        _.forEach(self.tiles, function(tile){
+            tiles.push(tile.getState());
+        });
+        return {tiles: tiles};
+    };
 
     var peek = function() {
         if (count() === 0) {
             throw new Error('No tiles left in bag');
         }
-        return tiles[0];
+        return self.tiles[0];
     };
 
     var get = function() {
         if (count() === 0){
             throw new Error('No tiles left in bag');
         }
-        return tiles.pop();
+        return self.tiles.pop();
     };
 
     var put = function(tile) {
-        tiles.push(tile);
+        self.tiles.push(tile);
     };
 
     var count = function() {
-        return tiles.length;
+        return self.tiles.length;
     };
 
     return {
+        getState: getState,
         count: count,
         peek: peek,
         get: get,
-        put: put,
+        put: put
     }
 }
 
-module.exports = TileBag;
+module.exports = {
+    TileBag: TileBag,
+    fromState: fromState
+};

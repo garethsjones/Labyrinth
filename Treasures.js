@@ -24,7 +24,7 @@ function Home(id, desc, colour) {
 
 var i = 0;
 var treasure = {
-    EMPTY: new Destination(i++, 'Empty', 'white', false),
+    EMPTY: new Destination(i++, ' ', 'Empty', 'white', false),
     /*1*/ GREEN_EXIT: Home(i++, 'Green exit', 'green'),
     /*2*/ BLUE_EXIT: Home(i++, 'Blue exit', 'blue'),
     /*3*/ YELLOW_EXIT: Home(i++, 'Yellow exit', 'yellow'),
@@ -55,4 +55,6 @@ var treasure = {
     /*X*/ BOOK: Treasure(i++, 'Book', 'red')
 };
 
-module.exports = treasure;
+module.exports = {
+    Treasures: treasure
+};

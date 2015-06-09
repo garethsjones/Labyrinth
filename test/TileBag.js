@@ -1,8 +1,8 @@
 var should = require("chai").should(),
     _ = require('lodash');
 
-var TileBag = require("../TileBag"),
-    Treasures = require("../Treasures");
+var TileBag = require("../TileBag").TileBag,
+    Treasures = require("../Treasures").Treasures;
 
 describe('TileBag', function(){
 

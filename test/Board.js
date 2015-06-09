@@ -2,12 +2,12 @@ var should = require("chai").should,
     expect = require("chai").expect,
     _ = require("lodash");
 
-var Board = require('../Board'),
-    Player = require('../Player'),
-    TileBag = require('../TileBag'),
-    Treasures = require('../Treasures'),
+var Board = require('../Board').Board,
+    Player = require('../Player').Player,
+    TileBag = require('../TileBag').TileBag,
+    Treasures = require('../Treasures').Treasures,
     Printer = require('../AsciiBoardPrinter'),
-    Tile = require('../Tile');
+    Tile = require('../Tile').Tile;
 
 describe('Board', function(){
 

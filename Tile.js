@@ -1,15 +1,42 @@
 var _ = require('lodash');
 
-var Treasures = require('./Treasures');
+var Treasures = require('./Treasures').Treasures,
+    PLAYER = require('./Player');
+
+var FROM_STATE = 'FROM_STATE';
+
+function fromState(state){
+    return new Tile(FROM_STATE, state);
+}
 
 function Tile(exits, treasure, players) {
-    treasure = typeof treasure === 'undefined' ? Treasures.EMPTY : treasure;
-    players = typeof players === 'undefined' ? [] : players;
 
     var self = this;
-    this.exits = exits;
-    this.treasure = treasure;
-    this.players = {};
+
+    if (exits === FROM_STATE) {
+        self = treasure;
+        _.forEach(_.keys(self.players), function(id){
+            self.players[id] = PLAYER.fromState(self.players[id]);
+        });
+    } else {
+        treasure = typeof treasure === 'undefined' ? Treasures.EMPTY : treasure;
+        players = typeof players === 'undefined' ? [] : players;
+
+        this.exits = exits;
+        this.treasure = treasure;
+        this.players = {};
+    }
+
+    var getState = function(){
+        var state = {};
+        state.exits = self.exits;
+        state.treasure = self.treasure;
+        state.players = {};
+        _.forEach(_.keys(self.players), function(id){
+            state.players[id] = self.players[id].getState();
+        });
+        return state;
+    };
 
     var addPlayer = function(player) {
         self.players[player.getId()] = player;
@@ -65,6 +92,7 @@ function Tile(exits, treasure, players) {
     };
 
     return {
+        getState: getState,
         addPlayer: addPlayer,
         removePlayer: removePlayer,
         getPlayers: getPlayers,
@@ -78,4 +106,7 @@ function Tile(exits, treasure, players) {
     }
  }
 
-module.exports = Tile;
+module.exports = {
+    Tile: Tile,
+    fromState: fromState
+};

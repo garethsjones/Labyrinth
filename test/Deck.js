@@ -1,8 +1,8 @@
 var should = require("chai").should(),
     _ = require("lodash");
 
-var Deck = require('../Deck'),
-    Treasures = require('../Treasures');
+var Deck = require('../Deck').Deck,
+    Treasures = require('../Treasures').Treasures;
 
 describe('Deck', function(){
 

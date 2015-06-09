@@ -1,18 +1,31 @@
 var _ = require('lodash');
 
-var Treasures = require('./Treasures');
+var Treasures = require('./Treasures').Treasures;
 
-var Deck = function () {
+function fromState(state){
+    return new Deck(state);
+}
+
+var Deck = function (state) {
     var self = this;
-    this.cards = [];
 
-    _.forEach(Treasures, function(item) {
-        if (item.collectable) {
-            self.cards.push(_.omit(item, 'collectable'));
-        }
-    });
+    if (typeof state != 'undefined') {
+        self = state;
+    } else {
+        this.cards = [];
 
-    this.cards = _.shuffle(this.cards);
+        _.forEach(Treasures, function(item) {
+            if (item.collectable) {
+                self.cards.push(_.omit(item, 'collectable'));
+            }
+        });
+
+        this.cards = _.shuffle(this.cards);
+    }
+
+    var getState = function(){
+        return self;
+    };
 
     var deal = function() {
         if (self.cards.length === 0) {
@@ -29,9 +42,13 @@ var Deck = function () {
     };
 
     return {
+        getState: getState,
         deal: deal,
         exits: exits
     }
 };
 
-module.exports = Deck;
+module.exports = {
+    Deck: Deck,
+    fromState: fromState
+};

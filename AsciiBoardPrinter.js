@@ -1,7 +1,8 @@
 var _ = require('lodash'),
     colors = require('colors');
 
-var treasure = require('./Treasures');
+var Treasures = require('./Treasures').Treasures,
+    BOARD_LENGTH = require('./Board').LENGTH;
 
 var WALL = '#',
     SPACE = 'O';
@@ -93,6 +94,7 @@ function treasureSpace(treasure) {
 }
 
 function wizard(player) {
+
     if (!player.isActive()) {
         return wall();
     }
@@ -130,7 +132,7 @@ function printGrid(board, highlightCoords, highlightColour) {
         bottomRow = typeof bottomRow !== 'undefined' ? bottomRow : false;
 
         log('-+'.grey);
-        _.times((board.length), function(n) {
+        _.times((BOARD_LENGTH), function(n) {
             hyphen();
             if (bottomRow) {
                 coord(n);
@@ -143,8 +145,8 @@ function printGrid(board, highlightCoords, highlightColour) {
         return console.log();
     }
 
-    var maxX = board.length - 1,
-        maxY = board.length - 1;
+    var maxX = BOARD_LENGTH - 1,
+        maxY = BOARD_LENGTH - 1;
 
     hr();
 
@@ -176,7 +178,7 @@ function printGrid(board, highlightCoords, highlightColour) {
                         break;
                     case 1:
                         tile.hasExit(3) ? space(spaceColour) : wall();
-                        board.get(x, y).getTreasure() == treasure.EMPTY ? space(spaceColour) : treasureSpace(tile.getTreasure());
+                        board.get(x, y).getTreasure().symbol == ' ' ? space(spaceColour) : treasureSpace(tile.getTreasure());
                         tile.hasExit(1) ? space(spaceColour) : wall();
                         break;
                     case 2:
@@ -219,7 +221,7 @@ function printTile(tile) {
                 break;
             case 1:
                 _.includes(exits, 3) ? space() : wall();
-                tile.getTreasure() == treasure.EMPTY ? space() : treasureSpace(tile.getTreasure());
+                tile.getTreasure().symbol == ' ' ? space('white') : treasureSpace(tile.getTreasure());
                 _.includes(exits, 1) ? space() : wall();
                 break;
             case 2:
