@@ -1,8 +1,10 @@
 var _ = require('lodash'),
     colors = require('colors');
 
-var Treasures = require('./Treasures').Treasures,
-    BOARD_LENGTH = require('./Board').LENGTH;
+var Board = require('./lib/Board'),
+    Tile = require('./lib/Tile'),
+    Treasures = require('./lib/Treasures').Treasures,
+    BOARD_LENGTH = require('./lib/Board').LENGTH;
 
 var WALL = '#',
     SPACE = 'O';
@@ -95,12 +97,12 @@ function treasureSpace(treasure) {
 
 function wizard(player) {
 
-    if (!player.isActive()) {
+    if (!player.isActive) {
         return wall();
     }
 
-    var s = player.getSymbol();
-    var colour = player.getColour();
+    var s = player.symbol;
+    var colour = player.colour;
 
     switch (colour) {
         case 'red':
@@ -126,7 +128,10 @@ function wizard(player) {
     }
 }
 
-function printGrid(board, highlightCoords, highlightColour) {
+function printBoard(board, highlightCoords, highlightColour) {
+
+    highlightCoords = highlightCoords || [];
+    highlightColour = highlightColour || 'white';
 
     function hr(bottomRow) {
         bottomRow = typeof bottomRow !== 'undefined' ? bottomRow : false;
@@ -163,7 +168,10 @@ function printGrid(board, highlightCoords, highlightColour) {
 
                 if (x == 0) pipe();
 
-                var tile = board.get(x, y);
+                var tile = Board.get(board, x, y),
+                    getPlayer = _.curry(Tile.getPlayer)(tile),
+                    hasExit = _.curry(Tile.hasExit)(tile);
+
                 var spaceColour = 'white';
 
                 if (_.some(highlightCoords, {x: x, y: y})) {
@@ -172,19 +180,19 @@ function printGrid(board, highlightCoords, highlightColour) {
 
                 switch (pass) {
                     case 0:
-                        tile.getPlayer(3) ? wizard(tile.getPlayer(3)) : wall();
-                        tile.hasExit(0) ? space(spaceColour) : wall();
-                        tile.getPlayer(4) ? wizard(tile.getPlayer(4)) : wall();
+                        getPlayer(3) ? wizard(getPlayer(3)) : wall();
+                        hasExit(0) ? space(spaceColour) : wall();
+                        getPlayer(4) ? wizard(getPlayer(4)) : wall();
                         break;
                     case 1:
-                        tile.hasExit(3) ? space(spaceColour) : wall();
-                        board.get(x, y).getTreasure().symbol == ' ' ? space(spaceColour) : treasureSpace(tile.getTreasure());
-                        tile.hasExit(1) ? space(spaceColour) : wall();
+                        hasExit(3) ? space(spaceColour) : wall();
+                        Board.get(board, x, y).treasure.symbol == ' ' ? space(spaceColour) : treasureSpace(tile.treasure);
+                        hasExit(1) ? space(spaceColour) : wall();
                         break;
                     case 2:
-                        tile.getPlayer(1) ? wizard(tile.getPlayer(1)) : wall();
-                        tile.hasExit(2) ? space(spaceColour) : wall();
-                        tile.getPlayer(2) ? wizard(tile.getPlayer(2)) : wall();
+                        getPlayer(1) ? wizard(getPlayer(1)) : wall();
+                        hasExit(2) ? space(spaceColour) : wall();
+                        getPlayer(2) ? wizard(getPlayer(2)) : wall();
                         break;
                 }
                 pipe();
@@ -197,7 +205,7 @@ function printGrid(board, highlightCoords, highlightColour) {
 
 function printTile(tile) {
 
-    var exits = tile.getExits();
+    var exits = tile.exits;
 
     function hr() {
         wall();
@@ -221,7 +229,7 @@ function printTile(tile) {
                 break;
             case 1:
                 _.includes(exits, 3) ? space() : wall();
-                tile.getTreasure().symbol == ' ' ? space('white') : treasureSpace(tile.getTreasure());
+                tile.treasure.symbol == ' ' ? space('white') : treasureSpace(tile.treasure);
                 _.includes(exits, 1) ? space() : wall();
                 break;
             case 2:
@@ -239,6 +247,6 @@ function printTile(tile) {
 }
 
 module.exports = {
-    printGrid: printGrid,
+    printBoard: printBoard,
     printTile: printTile
 };

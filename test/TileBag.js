@@ -1,54 +1,55 @@
 var should = require("chai").should(),
     _ = require('lodash');
 
-var TileBag = require("../TileBag").TileBag,
-    Treasures = require("../Treasures").Treasures;
+var TileBag = require("../lib/TileBag"),
+    Treasures = require("../lib/Treasures").Treasures,
+    Tile = require('../lib/Tile');
 
 describe('TileBag', function(){
 
     var tileBag;
 
     beforeEach(function(){
-        tileBag = new TileBag();
+        tileBag = TileBag.new();
     });
 
     describe('Tile I/O', function(){
 
         it('should peek at the next tile without removing it', function(){
-            var count = tileBag.count();
-            var topTile = tileBag.peek();
-            tileBag.peek().should.eql(topTile);
-            tileBag.count().should.equal(count);
+            var count = TileBag.count(tileBag);
+            var topTile = TileBag.peek(tileBag);
+            TileBag.peek(tileBag).should.eql(topTile);
+            TileBag.count(tileBag).should.equal(count);
         });
 
         it('should remove the next tile from the bag', function(){
-            var count = tileBag.count();
-            var topTile = tileBag.get();
+            var count = TileBag.count(tileBag);
+            var topTile = TileBag.get(tileBag);
             // TODO
             //tileBag.get().should.not.eql(topTile);
-            tileBag.count().should.not.equal(count);
+            TileBag.count(tileBag).should.not.equal(count);
         });
 
         it('should return the number of tiles in the bag', function(){
-            var initialCount = tileBag.count();
-            tileBag.get();
-            tileBag.count().should.equal(initialCount - 1);
-            tileBag.get();
-            tileBag.get();
-            tileBag.count().should.equal(initialCount - 3);
+            var initialCount = TileBag.count(tileBag);
+            TileBag.get(tileBag);
+            TileBag.count(tileBag).should.equal(initialCount - 1);
+            TileBag.get(tileBag);
+            TileBag.get(tileBag);
+            TileBag.count(tileBag).should.equal(initialCount - 3);
         });
 
         it('should throw an error when peeking into an empty bag', function(){
-            _.times(tileBag.count(), function(){
-                tileBag.get();
+            _.times(TileBag.count(tileBag), function(){
+                TileBag.get(tileBag);
             });
             // TODO
             //tileBag.peek().should.Throw();
         });
 
         it('should throw an error when removing a tile from an empty bag', function(){
-            _.times(tileBag.count(), function(){
-                tileBag.get();
+            _.times(TileBag.count(tileBag), function(){
+                TileBag.get(tileBag);
             });
             // TODO
             //tileBag.get().should.Throw();
@@ -58,26 +59,25 @@ describe('TileBag', function(){
     describe('Initial setup', function(){
 
         it('should start with 34 tiles', function(){
-            tileBag.count().should.equal(34);
+            TileBag.count(tileBag).should.equal(34);
         });
 
         function isTJunctionTile(tile){
-            return tile.getExits().length === 3;
+            return tile.exits.length === 3;
         }
 
         function isStraightTile(tile){
 
-            if (tile.getExits().length !== 2) {
+            if (tile.exits.length !== 2) {
                 return false;
             }
 
-            return ((tile.hasExit(0) && tile.hasExit(2)) ||
-                (tile.hasExit(1) && tile.hasExit(3)));
+            return ((Tile.hasExit(tile, 0) && Tile.hasExit(tile, 2)) ||
+                (Tile.hasExit(tile, 1) && Tile.hasExit(tile, 3)));
         }
 
         function isCornerTile(tile){
-
-            if (tile.getExits().length !== 2) {
+            if (tile.exits.length !== 2) {
                 return false;
             }
 
@@ -86,8 +86,8 @@ describe('TileBag', function(){
 
         it('should contain 6 T-junction tiles', function(){
             var tileCount = 0;
-            while(tileBag.count() !== 0) {
-                if (isTJunctionTile(tileBag.get())) {
+            while(TileBag.count(tileBag) !== 0) {
+                if (isTJunctionTile(TileBag.get(tileBag))) {
                     tileCount++;
                 }
             }
@@ -96,8 +96,8 @@ describe('TileBag', function(){
 
         it('should contain 12 straight tiles', function(){
             var tileCount = 0;
-            while(tileBag.count() !== 0) {
-                if (isStraightTile(tileBag.get())) {
+            while(TileBag.count(tileBag) !== 0) {
+                if (isStraightTile(TileBag.get(tileBag))) {
                     tileCount++;
                 }
             }
@@ -106,8 +106,8 @@ describe('TileBag', function(){
 
         it('should contain 16 corner tiles', function(){
             var tileCount = 0;
-            while(tileBag.count() !== 0) {
-                if (isCornerTile(tileBag.get())) {
+            while(TileBag.count(tileBag) !== 0) {
+                if (isCornerTile(TileBag.get(tileBag))) {
                     tileCount++;
                 }
             }
@@ -115,9 +115,9 @@ describe('TileBag', function(){
         });
 
         it('should contain a ghost on a T-junction piece', function(){
-            while(tileBag.count() !== 0) {
-                var tile = tileBag.get();
-                if (isTJunctionTile(tile) && tile.getTreasure() == Treasures.GHOST) {
+            while(TileBag.count(tileBag) !== 0) {
+                var tile = TileBag.get(tileBag);
+                if (isTJunctionTile(tile) && tile.treasure == Treasures.GHOST) {
                     return;
                 }
             }
@@ -125,9 +125,9 @@ describe('TileBag', function(){
         });
 
         it('should contain an owl on a corner piece', function(){
-            while(tileBag.count() !== 0) {
-                var tile = tileBag.get();
-                if (isCornerTile(tile) && tile.getTreasure() == Treasures.OWL) {
+            while(TileBag.count(tileBag) !== 0) {
+                var tile = TileBag.get(tileBag);
+                if (isCornerTile(tile) && tile.treasure == Treasures.OWL) {
                     return;
                 }
             }

@@ -4,10 +4,10 @@ var _ = require('lodash'),
 
 mongoose.connect('mongodb://localhost/labyrinth');
 
-var TILE_BAG = require('./TileBag'),
-    BOARD = require('./Board'),
-    DECK = require('./Deck'),
-    PLAYER = require('./Player'),
+var TILE_BAG = require('./lib/TileBag'),
+    BOARD = require('./lib/Board'),
+    DECK = require('./lib/Deck'),
+    PLAYER = require('./lib/Player'),
     TileBag = TILE_BAG.TileBag,
     Board = BOARD.Board,
     Deck = DECK.Deck,
