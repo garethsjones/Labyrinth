@@ -298,4 +298,46 @@ describe('Board', function(){
             assert.deepEqual(Board.whereIsPlayer(board, 2), {x: 1, y: 6});
         });
     });
+
+    describe('playableCoords()', function(){
+
+        function assertNotContainsCoord(coords, x, y){
+            assert.equal(_.filter(coords, function(coord){
+                return coord.x == x && coord.y == y;
+            }).length, 0);
+        }
+
+        it('should allow all coords on first turn', function(){
+            var coords = Board.playableCoords(board);
+            assert.equal(coords.length, 12);
+        });
+
+        it('should disallow pushing column back down', function(){
+            Board.play(board, 1, 0, TileBag.peek(tileBag));
+            var coords = Board.playableCoords(board);
+            assert.equal(coords.length, 11);
+            assertNotContainsCoord(coords, 1, 6);
+        });
+
+        it('should disallow pushing column back up', function(){
+            Board.play(board, 3, 6, TileBag.peek(tileBag));
+            var coords = Board.playableCoords(board);
+            assert.equal(coords.length, 11);
+            assertNotContainsCoord(coords, 3, 0);
+        });
+
+        it('should disallow pushing column back right', function(){
+            Board.play(board, 6, 5, TileBag.peek(tileBag));
+            var coords = Board.playableCoords(board);
+            assert.equal(coords.length, 11);
+            assertNotContainsCoord(coords, 0, 5);
+        });
+
+        it('should disallow pushing column back left', function(){
+            Board.play(board, 0, 3, TileBag.peek(tileBag));
+            var coords = Board.playableCoords(board);
+            assert.equal(coords.length, 11);
+            assertNotContainsCoord(coords, 6, 3);
+        });
+    })
 });
