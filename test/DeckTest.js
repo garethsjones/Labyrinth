@@ -22,12 +22,12 @@ describe('Deck', function(){
             assert.deepEqual(Deck.exits[2], _.omit(Treasures.BLUE_EXIT, 'collectable'));
         });
 
-        it('should initialise with yellow exit', function(){
-            assert.deepEqual(Deck.exits[3], _.omit(Treasures.YELLOW_EXIT, 'collectable'));
+        it('should initialise with red exit', function(){
+            assert.deepEqual(Deck.exits[3], _.omit(Treasures.RED_EXIT, 'collectable'));
         });
 
-        it('should initialise with red exit', function(){
-            assert.deepEqual(Deck.exits[4], _.omit(Treasures.RED_EXIT, 'collectable'));
+        it('should initialise with yellow exit', function(){
+            assert.deepEqual(Deck.exits[4], _.omit(Treasures.YELLOW_EXIT, 'collectable'));
         });
     });
 

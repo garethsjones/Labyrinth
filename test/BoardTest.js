@@ -5,7 +5,7 @@ var Board = require('../lib/Board'),
     Player = require('../lib/Player'),
     TileBag = require('../lib/TileBag'),
     Treasures = require('../lib/Treasures').Treasures,
-    Printer = require('../AsciiBoardPrinter'),
+    Printer = require('../AsciiPrinter'),
     Tile = require('../lib/Tile');
 
 describe('Board', function(){
@@ -94,7 +94,7 @@ describe('Board', function(){
     describe('whereIsPlayer()', function(){
 
         it('should find a player', function(){
-            assert.deepEqual(Board.whereIsPlayer(board, 3), {x: 0, y: 6});
+            assert.deepEqual(Board.whereIsPlayer(board, 4), {x: 0, y: 6});
         });
 
         it('should return null when it can\'t find a player', function(){

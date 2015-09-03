@@ -12,7 +12,7 @@ var TILE_BAG = require('./lib/TileBag'),
     Board = BOARD.Board,
     Deck = DECK.Deck,
     Player = PLAYER.Player,
-    Printer = require('./AsciiBoardPrinter'),
+    Printer = require('./AsciiPrinter'),
     GameModel = require('./GameModel').GameModel,
     TREASURES_TO_WIN = 3;
 

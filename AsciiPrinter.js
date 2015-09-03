@@ -4,6 +4,9 @@ var _ = require('lodash'),
 var Board = require('./lib/Board'),
     Tile = require('./lib/Tile'),
     Treasures = require('./lib/Treasures').Treasures,
+    TileBag = require('./lib/TileBag'),
+    Deck = require('./lib/Deck'),
+    Player = require('./lib/Player'),
     BOARD_LENGTH = require('./lib/Board').LENGTH;
 
 var WALL = '#',
@@ -128,6 +131,43 @@ function wizard(player) {
     }
 }
 
+function printGame(game, player) {
+
+    player = typeof player !== 'undefined' ? player : game.players[_.keys(game.players)[game.turn]];
+
+    console.log(player);
+
+    var coords = Board.whereIsPlayer(game.board, player.id),
+        treasureCoords = Board.whereIsTreasure(game.board, player.card.symbol),
+        availableCoords = [];
+
+    if (coords != null) {
+        availableCoords = Board.whereCanIGo(game.board, coords.x, coords.y);
+    }
+
+    console.log('\nBoard:');
+    printBoard(game.board, availableCoords, player.colour);
+
+    console.log('\nTile in hand:');
+    printTile(TileBag.peek(game.tileBag));
+
+    console.log('\nCurrent turn: ' + player.colour + " (" + player.treasureCount + ")");
+    console.log('Turn phase: ' + game.phase);
+    console.log('Position: ' + coords.x + ',' + coords.y);
+
+    if (treasureCoords != null) {
+        console.log('Objective: ' + player.card.desc + ' (' + player.card.symbol + ") @ " + treasureCoords.x + "," + treasureCoords.y);
+    } else {
+        console.log('Objective: ' + player.card.desc + ' (' + player.card.symbol + ") in hand");
+    }
+
+    var s = "";
+    _.forEach(availableCoords, function(coords) {
+        s += coords.x + ',' + coords.y + ' ';
+    });
+    console.log("Available moves: " + s);
+}
+
 function printBoard(board, highlightCoords, highlightColour) {
 
     highlightCoords = highlightCoords || [];
@@ -180,9 +220,9 @@ function printBoard(board, highlightCoords, highlightColour) {
 
                 switch (pass) {
                     case 0:
-                        getPlayer(3) ? wizard(getPlayer(3)) : wall();
-                        hasExit(0) ? space(spaceColour) : wall();
                         getPlayer(4) ? wizard(getPlayer(4)) : wall();
+                        hasExit(0) ? space(spaceColour) : wall();
+                        getPlayer(3) ? wizard(getPlayer(3)) : wall();
                         break;
                     case 1:
                         hasExit(3) ? space(spaceColour) : wall();
@@ -247,6 +287,7 @@ function printTile(tile) {
 }
 
 module.exports = {
+    printGame: printGame,
     printBoard: printBoard,
     printTile: printTile
 };
