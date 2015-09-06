@@ -49,11 +49,9 @@ describe('AI', function(){
         assertCoord({x: 1, y: 0}, placement);
     });
 
-    it.only('should lay tile on accessible space if objective is in hand', function(){
+    it('should lay tile on accessible space if objective is in hand', function(){
 
         var game = generateGame(0, 0, Treasures.GHOST, 'play');
-
-        Printer.printGame(game);
 
         var placement = AI.bestPlacement(game, 1);
 
@@ -66,6 +64,17 @@ describe('AI', function(){
 
         AI.bestPlacement(game, 1);
     });
+
+    //it.only('should think a move ahead to take advantage of warping', function(){
+    //
+    //    var game = generateGame(0, 0, Treasures.BOOK, 'play');
+    //
+    //    Printer.printGame(game);
+    //
+    //    var placement = AI.bestPlacement(game, 1);
+    //
+    //    assertCoord({x: 1, y: 0}, placement);
+    //});
 
     function assertCoord(expected, actual){
         assert.equal(expected.x + ',' + expected.y, actual.x + ',' + actual.y);

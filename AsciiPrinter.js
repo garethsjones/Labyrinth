@@ -7,7 +7,8 @@ var Board = require('./lib/Board'),
     TileBag = require('./lib/TileBag'),
     Deck = require('./lib/Deck'),
     Player = require('./lib/Player'),
-    BOARD_LENGTH = require('./lib/Board').LENGTH;
+    Game = require('./lib/Game'),
+    BOARD_LENGTH = Board.LENGTH;
 
 var WALL = '#',
     SPACE = 'O';
@@ -133,7 +134,7 @@ function wizard(player) {
 
 function printGame(game, player) {
 
-    player = typeof player !== 'undefined' ? player : game.players[_.keys(game.players)[game.turn]];
+    player = typeof player !== 'undefined' ? player : Game.whoseTurn(game);
 
     var coords = Board.whereIsPlayer(game.board, player.id),
         treasureCoords = Board.whereIsTreasure(game.board, player.card.symbol),
@@ -144,7 +145,7 @@ function printGame(game, player) {
     }
 
     console.log('\nBoard:');
-    printBoard(game.board, availableCoords, player.colour);
+    printBoard(game.board, availableCoords, treasureCoords, player.colour);
 
     console.log('\nTile in hand:');
     printTile(TileBag.peek(game.tileBag));
@@ -159,16 +160,17 @@ function printGame(game, player) {
         console.log('Objective: ' + player.card.desc + ' (' + player.card.symbol + ") in hand");
     }
 
-    var s = "";
-    _.forEach(availableCoords, function(coords) {
-        s += coords.x + ',' + coords.y + ' ';
-    });
-    console.log("Available moves: " + s);
+    //var s = "";
+    //_.forEach(availableCoords, function(coords) {
+    //    s += coords.x + ',' + coords.y + ' ';
+    //});
+    //console.log("Available moves: " + s);
 }
 
-function printBoard(board, highlightCoords, highlightColour) {
+function printBoard(board, availableCoords, objectiveCoord, highlightColour) {
 
-    highlightCoords = highlightCoords || [];
+    availableCoords = availableCoords || [];
+    objectiveCoord = objectiveCoord || null;
     highlightColour = highlightColour || 'white';
 
     function hr(bottomRow) {
@@ -212,7 +214,9 @@ function printBoard(board, highlightCoords, highlightColour) {
 
                 var spaceColour = 'white';
 
-                if (_.some(highlightCoords, {x: x, y: y})) {
+                if (objectiveCoord != null && objectiveCoord.x == x && objectiveCoord.y == y) {
+                    spaceColour = 'magenta';
+                } else if (_.some(availableCoords, {x: x, y: y})) {
                     spaceColour = highlightColour;
                 }
 
