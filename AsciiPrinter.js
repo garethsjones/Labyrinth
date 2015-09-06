@@ -135,8 +135,6 @@ function printGame(game, player) {
 
     player = typeof player !== 'undefined' ? player : game.players[_.keys(game.players)[game.turn]];
 
-    console.log(player);
-
     var coords = Board.whereIsPlayer(game.board, player.id),
         treasureCoords = Board.whereIsTreasure(game.board, player.card.symbol),
         availableCoords = [];
