@@ -22,14 +22,17 @@ describe('AI', function(){
         assertCoord({x: 0, y: 2}, coords);
     });
 
-    it('should move toward an unavailable objective', function(){
-
-        var game = generateGame(0, 0, Treasures.SPIDER, 'move');
-
-        var coords = AI.bestMove(game, 1);
-
-        assertCoord({x: 0, y: 1}, coords);
-    });
+    // This is a bit subjective
+    //it.only('should move toward an unavailable objective', function(){
+    //
+    //    var game = generateGame(0, 0, Treasures.SPIDER, 'move');
+    //
+    //    Printer.printGame(game);
+    //
+    //    var coords = AI.bestMove(game, 1);
+    //
+    //    assertCoord({x: 0, y: 1}, coords);
+    //});
 
     it('should not move away from an unavailable objective', function(){
 
@@ -65,16 +68,23 @@ describe('AI', function(){
         AI.bestPlacement(game, 1);
     });
 
-    //it.only('should think a move ahead to take advantage of warping', function(){
-    //
-    //    var game = generateGame(0, 0, Treasures.BOOK, 'play');
-    //
-    //    Printer.printGame(game);
-    //
-    //    var placement = AI.bestPlacement(game, 1);
-    //
-    //    assertCoord({x: 1, y: 0}, placement);
-    //});
+    it('should think a move ahead to take advantage of warping', function(){
+
+        var game = generateGame(0, 0, Treasures.SWORD, 'move');
+
+        var move = AI.bestMove(game, 1);
+
+        assertCoord({x: 0, y: 1}, move);
+    });
+
+    it('should warp across the board to pick up a treasure', function(){
+
+        var game = generateGame(3, 0, Treasures.PURSE, 'play');
+
+        var placement = AI.bestPlacement(game, 1);
+
+        assertCoord({x: 3, y: 6}, placement);
+    });
 
     function assertCoord(expected, actual){
         assert.equal(expected.x + ',' + expected.y, actual.x + ',' + actual.y);

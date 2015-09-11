@@ -12,9 +12,9 @@ var play = require('./lib/Play');
 
 var game = Game.new(
     Player.PLAYER_TYPE_CPU_1,
-    Player.PLAYER_TYPE_CPU_1,
-    Player.PLAYER_TYPE_CPU_1,
-    Player.PLAYER_TYPE_CPU_1);
+    Player.PLAYER_TYPE_NONE,
+    Player.PLAYER_TYPE_NONE,
+    Player.PLAYER_TYPE_NONE);
 
 Printer.printGame(game);
 console.log('\nCommand:');
