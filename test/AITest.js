@@ -81,7 +81,7 @@ describe('AI', function(){
         var game = generateGame(5, 4, Treasures.GEM, Game.PHASE_SHIFT);
         addDummy(game, 3, 5);
 
-        var shift = AI.bestShift(game, 1, Player.PLAYER_TYPE_CPU_AGGRESSIVE);
+        var shift = AI.bestShift(game, 1, Player.PLAYER_TYPES.CPU.AGGRESSIVE);
 
         assertCoord({x: 3, y: 0}, shift);
     });
@@ -91,7 +91,7 @@ describe('AI', function(){
     }
 
     function addDummy(game, x, y) {
-        game.players[3] = Player.new(3, Colours.RED,  Player.PLAYER_TYPE_CPU_OPEN);
+        game.players[3] = Player.new(3, Colours.RED,  Player.PLAYER_TYPES.CPU.OPEN);
         Tile.addPlayer(Board.get(game.board, x, y), game.players[3]);
     }
 
@@ -100,7 +100,7 @@ describe('AI', function(){
         deck.push(treasure);
 
         var players = {
-            1: Player.new(1, Colours.GREEN,  Player.PLAYER_TYPE_CPU_OPEN)
+            1: Player.new(1, Colours.GREEN,  Player.PLAYER_TYPES.CPU.OPEN)
         };
 
         Player.assignCard(players[1], Deck.deal(deck));

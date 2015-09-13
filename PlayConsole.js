@@ -11,10 +11,10 @@ var Game = require('./lib/Game'),
 var play = require('./lib/Play');
 
 var game = Game.new(
-    Player.PLAYER_TYPE_HUMAN,
-    Player.PLAYER_TYPE_CPU_RANDOM,
-    Player.PLAYER_TYPE_CPU_OPEN,
-    Player.PLAYER_TYPE_CPU_AGGRESSIVE);
+    Player.PLAYER_TYPES.CPU.NICE,
+    Player.PLAYER_TYPES.CPU.IDIOT,
+    Player.PLAYER_TYPES.CPU.OPEN,
+    Player.PLAYER_TYPES.CPU.AGGRESSIVE);
 
 Printer.printGame(game);
 console.log('\nCommand:');
