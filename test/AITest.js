@@ -1,13 +1,15 @@
 var assert = require("chai").assert,
     _ = require('lodash');
 
-var TileBag = require('../lib/TileBag'),
+var Game = require('../lib/Game'),
+    Colours = require('../lib/Colours'),
+    TileBag = require('../lib/TileBag'),
     Board = require('../lib/Board'),
     Deck = require('../lib/Deck'),
     Player = require('../lib/Player'),
     Tile = require('../lib/Tile'),
     play = require('../lib/Play'),
-    Treasures = require('../lib/Treasures').Treasures,
+    Treasures = require('../lib/Treasures'),
     Printer = require('../AsciiPrinter'),
     AI = require('../lib/AI');
 
@@ -15,62 +17,50 @@ describe('AI', function(){
 
     it('should move onto an available objective', function(){
 
-        var game = generateGame(0, 0, Treasures.RING, 'move');
+        var game = generateGame(0, 0, Treasures.RING, Game.PHASE_MOVE);
 
-        var coords = AI.bestMove(game, 1);
+        var move = AI.bestMove(game, 1);
 
-        assertCoord({x: 0, y: 2}, coords);
+        assertCoord({x: 0, y: 2}, move);
     });
-
-    // This is a bit subjective
-    //it.only('should move toward an unavailable objective', function(){
-    //
-    //    var game = generateGame(0, 0, Treasures.SPIDER, 'move');
-    //
-    //    Printer.printGame(game);
-    //
-    //    var coords = AI.bestMove(game, 1);
-    //
-    //    assertCoord({x: 0, y: 1}, coords);
-    //});
 
     it('should not move away from an unavailable objective', function(){
 
-        var game = generateGame(0, 0, Treasures.HELMET, 'move');
+        var game = generateGame(0, 0, Treasures.HELMET, Game.PHASE_MOVE);
 
-        var coords = AI.bestMove(game, 1);
+        var move = AI.bestMove(game, 1);
 
-        assertCoord({x: 0, y: 0}, coords);
+        assertCoord({x: 0, y: 0}, move);
     });
 
     it('should lay tile to make objective available', function(){
 
-        var game = generateGame(0, 0, Treasures.HELMET, 'play');
+        var game = generateGame(0, 0, Treasures.HELMET, Game.PHASE_SHIFT);
 
-        var placement = AI.bestPlacement(game, 1);
+        var shift = AI.bestShift(game, 1);
 
-        assertCoord({x: 1, y: 0}, placement);
+        assertCoord({x: 1, y: 0}, shift);
     });
 
     it('should lay tile on accessible space if objective is in hand', function(){
 
-        var game = generateGame(0, 0, Treasures.GHOST, 'play');
+        var game = generateGame(0, 0, Treasures.GHOST, Game.PHASE_SHIFT);
 
-        var placement = AI.bestPlacement(game, 1);
+        var shift = AI.bestShift(game, 1);
 
-        assertCoord({x: 1, y: 0}, placement);
+        assertCoord({x: 1, y: 0}, shift);
     });
 
     it('should not crash when objective is on the edge', function(){
 
-        var game = generateGame(0, 0, Treasures.OWL, 'play');
+        var game = generateGame(0, 0, Treasures.OWL, Game.PHASE_SHIFT);
 
-        AI.bestPlacement(game, 1);
+        AI.bestShift(game, 1);
     });
 
     it('should think a move ahead to take advantage of warping', function(){
 
-        var game = generateGame(0, 0, Treasures.SWORD, 'move');
+        var game = generateGame(0, 0, Treasures.SWORD, Game.PHASE_MOVE);
 
         var move = AI.bestMove(game, 1);
 
@@ -79,21 +69,21 @@ describe('AI', function(){
 
     it('should warp across the board to pick up a treasure', function(){
 
-        var game = generateGame(3, 0, Treasures.PURSE, 'play');
+        var game = generateGame(3, 0, Treasures.PURSE, Game.PHASE_SHIFT);
 
-        var placement = AI.bestPlacement(game, 1);
+        var shift = AI.bestShift(game, 1);
 
-        assertCoord({x: 3, y: 6}, placement);
+        assertCoord({x: 3, y: 6}, shift);
     });
 
     it('should minimize opponents movement', function(){
 
-        var game = generateGame(5, 4, Treasures.GEM, 'play');
+        var game = generateGame(5, 4, Treasures.GEM, Game.PHASE_SHIFT);
         addDummy(game, 3, 5);
 
-        var placement = AI.bestPlacement(game, 1, Player.PLAYER_TYPE_CPU_AGGRESSIVE);
+        var shift = AI.bestShift(game, 1, Player.PLAYER_TYPE_CPU_AGGRESSIVE);
 
-        assertCoord({x: 3, y: 0}, placement);
+        assertCoord({x: 3, y: 0}, shift);
     });
 
     function assertCoord(expected, actual){
@@ -101,7 +91,7 @@ describe('AI', function(){
     }
 
     function addDummy(game, x, y) {
-        game.players[3] = Player.new(3, 'red',  Player.PLAYER_TYPE_CPU_OPEN);
+        game.players[3] = Player.new(3, Colours.RED,  Player.PLAYER_TYPE_CPU_OPEN);
         Tile.addPlayer(Board.get(game.board, x, y), game.players[3]);
     }
 
@@ -110,7 +100,7 @@ describe('AI', function(){
         deck.push(treasure);
 
         var players = {
-            1: Player.new(1, 'green',  Player.PLAYER_TYPE_CPU_OPEN)
+            1: Player.new(1, Colours.GREEN,  Player.PLAYER_TYPE_CPU_OPEN)
         };
 
         Player.assignCard(players[1], Deck.deal(deck));

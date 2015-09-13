@@ -2,7 +2,7 @@ var assert = require("chai").assert,
     _ = require("lodash");
 
 var Deck = require('../lib/Deck'),
-    Treasures = require('../lib/Treasures').Treasures;
+    Treasures = require('../lib/Treasures');
 
 describe('Deck', function(){
 

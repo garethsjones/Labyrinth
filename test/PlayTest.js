@@ -1,13 +1,15 @@
 var assert = require("chai").assert,
     _ = require('lodash');
 
-var TileBag = require('../lib/TileBag'),
+var Game = require('../lib/Game'),
+    Colours = require('../lib/Colours'),
+    TileBag = require('../lib/TileBag'),
     Board = require('../lib/Board'),
     Deck = require('../lib/Deck'),
     Player = require('../lib/Player'),
     Tile = require('../lib/Tile'),
     play = require('../lib/Play'),
-    Treasures = require('../lib/Treasures').Treasures;
+    Treasures = require('../lib/Treasures');
 
 describe('Play', function(){
 
@@ -33,79 +35,79 @@ describe('Play', function(){
         act(2, "turn", false);
 
         act(1, "turna");
-        act(1, "play 1,0");
+        act(1, "shift 1,0");
         act(1, "move 2,0");
         assertPos(1, 2, 0);
         assertScores(1, 0, 0, 0);
 
         act(2, "flip");
-        act(2, "play 6,5");
+        act(2, "shift 6,5");
         act(2, "move 4,0");
         assertPos(2, 4, 0);
         assertScores(1, 0, 0, 0);
 
-        act(3, "play 5,0");
+        act(3, "shift 5,0");
         act(3, "move 1,4");
         assertPos(3, 1, 4);
         assertScores(1, 0, 1, 0);
 
-        act(4, "play 1,6");
+        act(4, "shift 1,6");
         act(4, "move 1,6");
         assertPos(3, 1, 3);
         assertPos(4, 1, 6);
         assertScores(1, 0, 1, 0);
 
         act(1, "turna");
-        act(1, "play 6,3");
+        act(1, "shift 6,3");
         act(1, "move 1,4");
         assertPos(3, 0, 3);
         assertScores(1, 0, 1, 0);
 
         act(2, "turn");
-        act(2, "play 6,5");
+        act(2, "shift 6,5");
         act(2, "move 6,5");
 
         act(3, "turna");
-        act(3, "play 0,3");
+        act(3, "shift 0,3");
         act(3, "move 0,1");
         assertScores(1, 0, 2, 0);
 
         act(4, "turn");
-        act(4, "play 1,0");
+        act(4, "shift 1,0");
         act(4, "move 5,0");
         assertScores(1, 0, 2, 1);
 
         act(1, "turn");
-        act(1, "play 6,5");
+        act(1, "shift 6,5");
         act(1, "move 0,4");
         assertScores(2, 0, 2, 1);
 
         act(2, "flip");
-        act(2, "play 6,3");
+        act(2, "shift 6,3");
         act(2, "move 6,5");
         assertScores(2, 1, 2, 1);
 
         act(3, "flip");
-        act(3, "play 1,0");
+        act(3, "shift 1,0");
         act(3, "move 4,6");
         assertScores(2, 1, 3, 1);
 
-        act(4, "play 0,3");
+        act(4, "shift 0,3");
         act(4, "move 1,2");
         assertScores(2, 1, 3, 2);
 
         act(1, "flip");
-        act(1, "play 0,3");
+        act(1, "shift 0,3");
         act(1, "move 1,0");
         assertScores(3, 1, 3, 2);
 
-        act(2, "play 0,1");
+        act(2, "shift 0,1");
         act(2, "move 4,4");
         assertScores(3, 2, 3, 2);
 
         assert.equal(null, game.winner);
         act(3, "flip");
-        act(3, "play 1,0");
+        act(3, "shift 1,0");
         act(3, "move 6,6");
         assert.equal(3, game.winner);
 
@@ -129,10 +131,10 @@ describe('Play', function(){
         deck.push(Treasures.CANDELABRA);
 
         var players = {
-            1: Player.new(1, 'green'),
-            2: Player.new(2, 'blue'),
-            3: Player.new(3, 'red'),
-            4: Player.new(4, 'yellow')
+            1: Player.new(1, Colours.GREEN),
+            2: Player.new(2, Colours.BLUE),
+            3: Player.new(3, Colours.RED),
+            4: Player.new(4, Colours.YELLOW)
         };
 
         Player.assignCard(players[1], Deck.deal(deck));
@@ -188,7 +190,7 @@ describe('Play', function(){
             tileBag: tileBag,
             players: players,
             turn: 0,
-            phase: 'play',
+            phase: Game.PHASE_SHIFT,
             winner: null
         };
     }

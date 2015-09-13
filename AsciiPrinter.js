@@ -1,9 +1,10 @@
 var _ = require('lodash'),
     colors = require('colors');
 
-var Board = require('./lib/Board'),
+var Colours = require('./lib/Colours'),
+    Board = require('./lib/Board'),
     Tile = require('./lib/Tile'),
-    Treasures = require('./lib/Treasures').Treasures,
+    Treasures = require('./lib/Treasures'),
     TileBag = require('./lib/TileBag'),
     Deck = require('./lib/Deck'),
     Player = require('./lib/Player'),
@@ -49,22 +50,22 @@ function wall() {
 function space(colour) {
 
     switch (colour) {
-        case 'red':
+        case Colours.RED:
             log(SPACE.red.bgRed);
             break;
-        case 'yellow':
+        case Colours.YELLOW:
             log(SPACE.yellow.bgYellow);
             break;
-        case 'blue':
+        case Colours.BLUE:
             log(SPACE.blue.bgBlue);
             break;
-        case 'green':
+        case Colours.GREEN:
             log(SPACE.green.bgGreen);
             break;
-        case 'cyan':
+        case Colours.CYAN:
             log(SPACE.cyan.bgCyan);
             break;
-        case 'magenta':
+        case Colours.MAGENTA:
             log(SPACE.magenta.bgMagenta);
             break;
         default:
@@ -76,22 +77,22 @@ function treasureSpace(treasure) {
     var s = treasure.symbol;
     var colour = treasure.colour;
     switch (colour) {
-        case 'red':
+        case Colours.RED:
             log(s.red.bgWhite);
             break;
-        case 'yellow':
+        case Colours.YELLOW:
             log(s.yellow.bgWhite);
             break;
-        case 'blue':
+        case Colours.BLUE:
             log(s.blue.bgWhite);
             break;
-        case 'green':
+        case Colours.GREEN:
             log(s.green.bgWhite);
             break;
-        case 'cyan':
+        case Colours.CYAN:
             log(s.cyan.bgWhite);
             break;
-        case 'magenta':
+        case Colours.MAGENTA:
             log(s.magenta.bgWhite);
             break;
         default:
@@ -109,22 +110,22 @@ function wizard(player) {
     var colour = player.colour;
 
     switch (colour) {
-        case 'red':
+        case Colours.RED:
             log(s.red.bgBlack);
             break;
-        case 'yellow':
+        case Colours.YELLOW:
             log(s.yellow.bgBlack);
             break;
-        case 'blue':
+        case Colours.BLUE:
             log(s.blue.bgBlack);
             break;
-        case 'green':
+        case Colours.GREEN:
             log(s.green.bgBlack);
             break;
-        case 'cyan':
+        case Colours.CYAN:
             log(s.cyan.bgBlack);
             break;
-        case 'magenta':
+        case Colours.MAGENTA:
             log(s.magenta.bgBlack);
             break;
         default:
@@ -136,12 +137,12 @@ function printGame(game, player) {
 
     player = typeof player !== 'undefined' ? player : Game.whoseTurn(game);
 
-    var coords = Board.whereIsPlayer(game.board, player.id),
-        treasureCoords = Board.whereIsTreasure(game.board, player.card.symbol),
+    var coords = Board.locatePlayer(game.board, player.id),
+        treasureCoords = Board.locateTreasure(game.board, player.card.symbol),
         availableCoords = [];
 
     if (coords != null) {
-        availableCoords = Board.whereCanIGo(game.board, coords.x, coords.y);
+        availableCoords = Board.path(game.board, coords.x, coords.y);
     }
 
     console.log('\nBoard:');
@@ -150,7 +151,7 @@ function printGame(game, player) {
     console.log('\nTile in hand:');
     printTile(TileBag.peek(game.tileBag));
 
-    console.log('\nCurrent turn: ' + player.colour + " (" + player.treasureCount + ")");
+    console.log('\nCurrent turn: ' + player.colour + " (" + player.score + ")");
     console.log('Turn phase: ' + game.phase);
     console.log('Position: ' + coords.x + ',' + coords.y);
 
@@ -159,19 +160,13 @@ function printGame(game, player) {
     } else {
         console.log('Objective: ' + player.card.desc + ' (' + player.card.symbol + ") in hand");
     }
-
-    //var s = "";
-    //_.forEach(availableCoords, function(coords) {
-    //    s += coords.x + ',' + coords.y + ' ';
-    //});
-    //console.log("Available moves: " + s);
 }
 
 function printBoard(board, availableCoords, objectiveCoord, highlightColour) {
 
     availableCoords = availableCoords || [];
     objectiveCoord = objectiveCoord || null;
-    highlightColour = highlightColour || 'white';
+    highlightColour = highlightColour || Colours.WHITE;
 
     function hr(bottomRow) {
         bottomRow = typeof bottomRow !== 'undefined' ? bottomRow : false;
@@ -212,10 +207,10 @@ function printBoard(board, availableCoords, objectiveCoord, highlightColour) {
                     getPlayer = _.curry(Tile.getPlayer)(tile),
                     hasExit = _.curry(Tile.hasExit)(tile);
 
-                var spaceColour = 'white';
+                var spaceColour = Colours.WHITE;
 
                 if (objectiveCoord != null && objectiveCoord.x == x && objectiveCoord.y == y) {
-                    spaceColour = 'magenta';
+                    spaceColour = Colours.MAGENTA;
                 } else if (_.some(availableCoords, {x: x, y: y})) {
                     spaceColour = highlightColour;
                 }
@@ -271,7 +266,7 @@ function printTile(tile) {
                 break;
             case 1:
                 _.includes(exits, 3) ? space() : wall();
-                tile.treasure.symbol == ' ' ? space('white') : treasureSpace(tile.treasure);
+                tile.treasure.symbol == ' ' ? space(Colours.WHITE) : treasureSpace(tile.treasure);
                 _.includes(exits, 1) ? space() : wall();
                 break;
             case 2:

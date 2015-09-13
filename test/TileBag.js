@@ -2,7 +2,7 @@ var should = require("chai").should(),
     _ = require('lodash');
 
 var TileBag = require("../lib/TileBag"),
-    Treasures = require("../lib/Treasures").Treasures,
+    Treasures = require("../lib/Treasures"),
     Tile = require('../lib/Tile');
 
 describe('TileBag', function(){

@@ -95,12 +95,12 @@ function play(err, gameModel) {
 }
 
 function print(game, player) {
-    var coords = game.board.whereIsPlayer(player.getId());
-    var treasureCoords = game.board.whereIsTreasure(player.getCard().symbol);
+    var coords = game.board.locatePlayer(player.getId());
+    var treasureCoords = game.board.locateTreasure(player.getCard().symbol);
     var availableCoords = [];
 
     if (coords != null) {
-        availableCoords = game.board.whereCanIGo(coords.x, coords.y);
+        availableCoords = game.board.path(coords.x, coords.y);
     }
 
     console.log('Board:');

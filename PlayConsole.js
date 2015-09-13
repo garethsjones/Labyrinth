@@ -26,14 +26,14 @@ stdin.addListener("data", function(input) {
     var actingPlayer = Game.whoseTurn(game);
 
     if (actingPlayer.playerType != Player.PLAYER_TYPE_HUMAN) {
-        if (game.phase == 'move') {
+        if (game.phase == Game.PHASE_MOVE) {
             var move = AI.bestMove(game, actingPlayer.id, actingPlayer.playerType);
             input = 'move ' + move.x + ',' + move.y;
         } else {
-            var placement = AI.bestPlacement(game, actingPlayer.id, actingPlayer.playerType);
-            play(game, actingPlayer.id, placement.rotation);
-            console.log(placement.rotation);
-            input = 'play ' + placement.x + ',' + placement.y;
+            var shift = AI.bestShift(game, actingPlayer.id, actingPlayer.playerType);
+            play(game, actingPlayer.id, shift.rotation);
+            console.log(shift.rotation);
+            input = 'shift ' + shift.x + ',' + shift.y;
         }
         console.log(input);
     }
@@ -48,8 +48,8 @@ stdin.addListener("data", function(input) {
         console.log('\n__!!GAME OVER!!__');
         console.log('\nWinner: ' + actingPlayer.colour);
         console.log('\nScores:');
-        _.each(_.sortByOrder(game.players, ['treasureCount'], [false]), function(player){
-            console.log(player.colour + ': ' + player.treasureCount);
+        _.each(_.sortByOrder(game.players, ['score'], [false]), function(player){
+            console.log(player.colour + ': ' + player.score);
         });
         process.exit(0);
     }
