@@ -86,8 +86,23 @@ describe('AI', function(){
         assertCoord({x: 3, y: 6}, placement);
     });
 
+    it('should minimize opponents movement', function(){
+
+        var game = generateGame(5, 4, Treasures.GEM, 'play');
+        addDummy(game, 3, 5);
+
+        var placement = AI.bestPlacement(game, 1, Player.PLAYER_TYPE_CPU_AGGRESSIVE);
+
+        assertCoord({x: 3, y: 0}, placement);
+    });
+
     function assertCoord(expected, actual){
         assert.equal(expected.x + ',' + expected.y, actual.x + ',' + actual.y);
+    }
+
+    function addDummy(game, x, y) {
+        game.players[3] = Player.new(3, 'red',  Player.PLAYER_TYPE_CPU_OPEN);
+        Tile.addPlayer(Board.get(game.board, x, y), game.players[3]);
     }
 
     function generateGame(x, y, treasure, phase){
@@ -95,7 +110,7 @@ describe('AI', function(){
         deck.push(treasure);
 
         var players = {
-            1: Player.new(1, 'green',  Player.PLAYER_TYPE_CPU_1)
+            1: Player.new(1, 'green',  Player.PLAYER_TYPE_CPU_OPEN)
         };
 
         Player.assignCard(players[1], Deck.deal(deck));

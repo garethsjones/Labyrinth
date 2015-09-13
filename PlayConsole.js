@@ -11,10 +11,10 @@ var Game = require('./lib/Game'),
 var play = require('./lib/Play');
 
 var game = Game.new(
-    Player.PLAYER_TYPE_CPU_1,
-    Player.PLAYER_TYPE_NONE,
-    Player.PLAYER_TYPE_NONE,
-    Player.PLAYER_TYPE_NONE);
+    Player.PLAYER_TYPE_HUMAN,
+    Player.PLAYER_TYPE_CPU_RANDOM,
+    Player.PLAYER_TYPE_CPU_OPEN,
+    Player.PLAYER_TYPE_CPU_AGGRESSIVE);
 
 Printer.printGame(game);
 console.log('\nCommand:');
@@ -25,12 +25,12 @@ stdin.addListener("data", function(input) {
 
     var actingPlayer = Game.whoseTurn(game);
 
-    if (actingPlayer.playerType == Player.PLAYER_TYPE_CPU_1) {
+    if (actingPlayer.playerType != Player.PLAYER_TYPE_HUMAN) {
         if (game.phase == 'move') {
-            var move = AI.bestMove(game, actingPlayer.id);
+            var move = AI.bestMove(game, actingPlayer.id, actingPlayer.playerType);
             input = 'move ' + move.x + ',' + move.y;
         } else {
-            var placement = AI.bestPlacement(game, actingPlayer.id);
+            var placement = AI.bestPlacement(game, actingPlayer.id, actingPlayer.playerType);
             play(game, actingPlayer.id, placement.rotation);
             console.log(placement.rotation);
             input = 'play ' + placement.x + ',' + placement.y;

@@ -63,10 +63,10 @@ describe('Board', function(){
         board = Board.new(tileBag, players);
     });
 
-    it('print the board', function(){
-        Printer.printBoard(board, [], 'green');
-        Printer.printTile(TileBag.peek(tileBag));
-    });
+    //it('print the board', function(){
+    //    Printer.printBoard(board, [], 'green');
+    //    Printer.printTile(TileBag.peek(tileBag));
+    //});
 
     describe('get()', function(){
 
