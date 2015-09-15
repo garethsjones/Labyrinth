@@ -6,13 +6,13 @@ var Game = require('./lib/Game'),
     TileBag = require('./lib/TileBag'),
     Player = require('./lib/Player'),
     AI = require('./lib/AI'),
-    Printer = require('./AsciiPrinter');
+    Printer = require('./lib/AsciiPrinter');
 
 var play = require('./lib/Play');
 
 var game = Game.new(
-    Player.PLAYER_TYPES.CPU.NICE,
-    Player.PLAYER_TYPES.CPU.IDIOT,
+    Player.PLAYER_TYPES.HUMAN,
+    Player.PLAYER_TYPES.CPU.RANDOM,
     Player.PLAYER_TYPES.CPU.OPEN,
     Player.PLAYER_TYPES.CPU.AGGRESSIVE);
 
@@ -25,7 +25,9 @@ stdin.addListener("data", function(input) {
 
     var actingPlayer = Game.whoseTurn(game);
 
-    if (actingPlayer.playerType != Player.PLAYER_TYPE_HUMAN) {
+    if (input == '?') {
+        // Display help text
+    } else if (actingPlayer.playerType != Player.PLAYER_TYPES.HUMAN) {
         if (game.phase == Game.PHASE_MOVE) {
             var move = AI.bestMove(game, actingPlayer.id, actingPlayer.playerType);
             input = 'move ' + move.x + ',' + move.y;

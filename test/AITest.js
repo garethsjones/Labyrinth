@@ -10,7 +10,7 @@ var Game = require('../lib/Game'),
     Tile = require('../lib/Tile'),
     play = require('../lib/Play'),
     Treasures = require('../lib/Treasures'),
-    Printer = require('../AsciiPrinter'),
+    Printer = require('../lib/AsciiPrinter'),
     AI = require('../lib/AI');
 
 describe('AI', function(){

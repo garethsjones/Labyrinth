@@ -6,7 +6,7 @@ var Colours = require('../lib/Colours'),
     Player = require('../lib/Player'),
     TileBag = require('../lib/TileBag'),
     Treasures = require('../lib/Treasures'),
-    Printer = require('../AsciiPrinter'),
+    Printer = require('../lib/AsciiPrinter'),
     Tile = require('../lib/Tile');
 
 describe('Board', function(){
