@@ -131,10 +131,10 @@ describe('Play', function(){
         deck.push(Treasures.CANDELABRA);
 
         var players = {
-            1: Player.new(1, Colours.GREEN),
-            2: Player.new(2, Colours.BLUE),
-            3: Player.new(3, Colours.RED),
-            4: Player.new(4, Colours.YELLOW)
+            1: Player.new(1, Colours.GREEN, Player.PLAYER_TYPES.HUMAN),
+            2: Player.new(2, Colours.BLUE, Player.PLAYER_TYPES.HUMAN),
+            3: Player.new(3, Colours.RED, Player.PLAYER_TYPES.HUMAN),
+            4: Player.new(4, Colours.YELLOW, Player.PLAYER_TYPES.HUMAN)
         };
 
         Player.assignCard(players[1], Deck.deal(deck));

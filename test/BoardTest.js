@@ -15,10 +15,10 @@ describe('Board', function(){
 
     beforeEach(function(){
         players = {
-            1: Player.new(1, Colours.GREEN),
-            2: Player.new(2, Colours.BLUE),
-            3: Player.new(3, Colours.YELLOW),
-            4: Player.new(4, Colours.RED)
+            1: Player.new(1, Colours.GREEN, Player.PLAYER_TYPES.HUMAN),
+            2: Player.new(2, Colours.BLUE, Player.PLAYER_TYPES.HUMAN),
+            3: Player.new(3, Colours.YELLOW, Player.PLAYER_TYPES.HUMAN),
+            4: Player.new(4, Colours.RED, Player.PLAYER_TYPES.HUMAN)
         };
 
         tileBag = TileBag.new();

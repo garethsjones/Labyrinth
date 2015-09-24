@@ -29,10 +29,10 @@ describe('Tile', function(){
         beforeEach(function(){
             tile = Tile.new([0,2]);
             players = {
-                1: Player.new(1, Colours.GREEN),
-                2: Player.new(2, Colours.BLUE),
-                3: Player.new(3, Colours.RED),
-                4: Player.new(4, Colours.YELLOW)
+                1: Player.new(1, Colours.GREEN, Player.PLAYER_TYPES.HUMAN),
+                2: Player.new(2, Colours.BLUE, Player.PLAYER_TYPES.HUMAN),
+                3: Player.new(3, Colours.RED, Player.PLAYER_TYPES.HUMAN),
+                4: Player.new(4, Colours.YELLOW, Player.PLAYER_TYPES.HUMAN)
             };
         });
 
@@ -45,8 +45,8 @@ describe('Tile', function(){
         });
 
         it('should be able to add players', function(){
-            Tile.addPlayer(tile, Player.new(3, Colours.RED));
-            Tile.addPlayer(tile, Player.new(4, Colours.YELLOW));
+            Tile.addPlayer(tile, Player.new(3, Colours.RED, Player.PLAYER_TYPES.HUMAN));
+            Tile.addPlayer(tile, Player.new(4, Colours.YELLOW, Player.PLAYER_TYPES.HUMAN));
             Tile.getPlayer(tile, 3).colour.should.equal(Colours.RED);
         });
     });

@@ -11,7 +11,7 @@ describe('Player', function(){
         var player;
 
         beforeEach(function(){
-            player = Player.new(1, Colours.GREEN);
+            player = Player.new(1, Colours.GREEN, Player.PLAYER_TYPES.HUMAN);
         });
 
         it('should start at 0 for a new player', function(){
