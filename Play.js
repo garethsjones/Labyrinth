@@ -30,7 +30,7 @@ figlet.text('LABYRINTH', {
         var game = Game.new(players[1], players[2], players[3], players[4]);
 
         Printer.printGame(game);
-        console.log('\nCommand:');
+        prompt(game);
 
         stdin.addListener("data", function(input) {
 
@@ -69,7 +69,18 @@ figlet.text('LABYRINTH', {
                 process.exit(0);
             }
 
-            console.log('\nCommand:');
+            prompt(game);
         });
     });
 });
+
+var prompt = function(game) {
+
+    var actingPlayer = Game.whoseTurn(game);
+
+    if (actingPlayer.playerType.humanity == Player.PLAYER_TYPES.HUMAN.humanity) {
+        console.log('\nCommand:');
+    } else {
+        console.log('\nPress enter to continue:');
+    }
+};
